@@ -420,47 +420,54 @@
 
         /* 6. Bottom Action Bar (Toolbar) */
         .action-toolbar {
-            background-color: #0f172a; /* Dark blue/slate strip */
-            padding: 10px 16px;
-            border-radius: 6px;
+            background-color: #0f172a;
+            border-top: 1px solid #1e3a8a; /* Thin lighter-blue top border */
+            padding: 12px 24px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            justify-content: center; /* Horizontally centered tight group */
             align-items: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: auto; /* Push to the bottom of the flex body */
         }
 
         .toolbar-btn {
-            background-color: #334155;
-            color: white;
-            border: none;
+            background-color: #f4f6f9;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
             border-radius: 4px;
-            padding: 6px 14px;
+            padding: 4px 12px;
             font-size: 0.8rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
             text-decoration: none;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
         }
 
         .toolbar-btn:hover {
-            background-color: #475569;
+            background-color: #e2e8f0;
+            border-color: #94a3b8;
         }
 
         .toolbar-btn:active {
             transform: scale(0.97);
         }
 
-        .toolbar-btn.btn-exit {
-            background-color: var(--maroon);
-            margin-left: auto;
+        .btn-icon-block {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            display: inline-block;
         }
 
-        .toolbar-btn.btn-exit:hover {
-            background-color: #991b1b;
-        }
+        .bg-green { background-color: #22c55e; }
+        .bg-orange { background-color: #f97316; }
+        .bg-red { background-color: #ef4444; }
+        .bg-blue { background-color: #3b82f6; }
+        .bg-gray { background-color: #94a3b8; }
 
         /* Task List Management container */
         .tasks-section {
@@ -717,50 +724,45 @@
                 </div>
             </div>
 
-            <!-- Current Tasks list (Visible below split panels for interactive testing) -->
-            <div class="card tasks-section">
-                <div class="tasks-card-header">
-                    Current Task Items
-                </div>
-                <div class="card-body">
-                    <asp:Repeater ID="rptTasks" runat="server" OnItemCommand="rptTasks_ItemCommand">
-                        <HeaderTemplate>
-                            <ul class="task-list">
-                        </HeaderTemplate>
-                        <ItemTemplate>
-                            <li class="task-item <%# If(Convert.ToBoolean(Eval("IsCompleted")), "completed", "") %>">
-                                <span class="task-text"><%# HttpUtility.HtmlEncode(Eval("Name")) %></span>
-                                <div class="task-actions">
-                                    <asp:LinkButton ID="btnToggle" runat="server" CommandName="Toggle" CommandArgument='<%# Eval("Id") %>' CssClass="action-btn toggle-btn" Text='<%# If(Convert.ToBoolean(Eval("IsCompleted")), "Undo", "Complete") %>' />
-                                    <asp:LinkButton ID="btnDelete" runat="server" CommandName="Delete" CommandArgument='<%# Eval("Id") %>' CssClass="action-btn delete-btn" Text="Delete" />
-                                </div>
-                            </li>
-                        </ItemTemplate>
-                        <FooterTemplate>
-                            </ul>
-                        </FooterTemplate>
-                    </asp:Repeater>
-                    
-                    <asp:Panel ID="pnlNoTasks" runat="server" Visible="true" CssClass="empty-tasks">
-                        No tasks in progress. Create your first task entry above to get started!
-                    </asp:Panel>
-                </div>
-            </div>
-
-            <!-- 6. Bottom Action Bar (Toolbar) -->
-            <div class="action-toolbar">
-                <button type="button" class="toolbar-btn" onclick="alert('New item action triggered (TODO)');">➕ New</button>
-                <button type="button" class="toolbar-btn" onclick="alert('Edit action triggered (TODO)');">📝 Edit</button>
-                <button type="button" class="toolbar-btn" onclick="alert('Delete action triggered (TODO)');">❌ Delete</button>
-                <button type="button" class="toolbar-btn" onclick="alert('Save action triggered (TODO)');">💾 Save</button>
-                <button type="button" class="toolbar-btn" onclick="alert('Cancel action triggered (TODO)');">🚫 Cancel</button>
-                <button type="button" class="toolbar-btn" onclick="alert('Search action triggered (TODO)');">🔍 Search</button>
-                <button type="button" class="toolbar-btn" onclick="alert('Print report action triggered (TODO)');">🖨️ Print</button>
+            <!-- Hidden panel to keep controls active in code-behind but invisible on page -->
+            <asp:Panel ID="pnlHiddenTasks" runat="server" Visible="false">
+                <asp:Repeater ID="rptTasks" runat="server" OnItemCommand="rptTasks_ItemCommand">
+                    <HeaderTemplate>
+                        <ul class="task-list">
+                    </HeaderTemplate>
+                    <ItemTemplate>
+                        <li class="task-item <%# If(Convert.ToBoolean(Eval("IsCompleted")), "completed", "") %>">
+                            <span class="task-text"><%# HttpUtility.HtmlEncode(Eval("Name")) %></span>
+                            <div class="task-actions">
+                                <asp:LinkButton ID="btnToggle" runat="server" CommandName="Toggle" CommandArgument='<%# Eval("Id") %>' CssClass="action-btn toggle-btn" Text='<%# If(Convert.ToBoolean(Eval("IsCompleted")), "Undo", "Complete") %>' />
+                                <asp:LinkButton ID="btnDelete" runat="server" CommandName="Delete" CommandArgument='<%# Eval("Id") %>' CssClass="action-btn delete-btn" Text="Delete" />
+                            </div>
+                        </li>
+                    </ItemTemplate>
+                    <FooterTemplate>
+                        </ul>
+                    </FooterTemplate>
+                </asp:Repeater>
                 
-                <!-- Exit button wires to Logout (clears session and redirects) -->
-                <asp:LinkButton ID="btnExit" runat="server" CssClass="toolbar-btn btn-exit" OnClick="btnLogout_Click" UseSubmitBehavior="false">🚪 Exit</asp:LinkButton>
-            </div>
+                <asp:Panel ID="pnlNoTasks" runat="server" Visible="true" CssClass="empty-tasks">
+                    No tasks in progress. Create your first task entry above to get started!
+                </asp:Panel>
+            </asp:Panel>
         </main>
+
+        <!-- 6. Bottom Action Bar (Toolbar) -->
+        <div class="action-toolbar">
+            <button type="button" class="toolbar-btn" onclick="alert('New item action triggered (TODO)');"><span class="btn-icon-block bg-green"></span>New</button>
+            <button type="button" class="toolbar-btn" onclick="alert('Edit action triggered (TODO)');"><span class="btn-icon-block bg-orange"></span>Edit</button>
+            <button type="button" class="toolbar-btn" onclick="alert('Delete action triggered (TODO)');"><span class="btn-icon-block bg-red"></span>Delete</button>
+            <button type="button" class="toolbar-btn" onclick="alert('Save action triggered (TODO)');"><span class="btn-icon-block bg-blue"></span>Save</button>
+            <button type="button" class="toolbar-btn" onclick="alert('Cancel action triggered (TODO)');"><span class="btn-icon-block bg-gray"></span>Cancel</button>
+            <button type="button" class="toolbar-btn" onclick="alert('Search action triggered (TODO)');"><span class="btn-icon-block bg-gray"></span>Search</button>
+            <button type="button" class="toolbar-btn" onclick="alert('Print report action triggered (TODO)');"><span class="btn-icon-block bg-gray"></span>Print</button>
+            
+            <!-- Exit button wires to Logout (clears session and redirects) -->
+            <asp:LinkButton ID="btnExit" runat="server" CssClass="toolbar-btn" OnClick="btnLogout_Click" UseSubmitBehavior="false"><span class="btn-icon-block bg-red"></span>Exit</asp:LinkButton>
+        </div>
 
         <!-- 7. Footer -->
         <footer class="footer">
