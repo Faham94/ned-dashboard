@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>University Admin Dashboard</title>
+    <title>Asset Information Form</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -253,23 +253,22 @@
         /* Main container layout */
         .main-container {
             flex: 1;
-            padding: 24px;
-            max-width: 1400px;
+            padding: 20px;
             width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
         }
 
         /* 5. Split Panels */
         .panels-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            grid-template-columns: 2.2fr 1fr;
+            gap: 20px;
         }
 
-        @media (max-width: 992px) {
+        @media (max-width: 1200px) {
             .panels-grid {
                 grid-template-columns: 1fr;
             }
@@ -278,7 +277,7 @@
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 8px;
+            border-radius: 6px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.03);
             overflow: hidden;
             display: flex;
@@ -289,7 +288,7 @@
             padding: 12px 18px;
             color: white;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
@@ -306,48 +305,47 @@
         }
 
         .card-body {
-            padding: 20px;
+            padding: 16px;
             flex: 1;
         }
 
-        /* 2-Column Grid Form */
-        .form-grid {
+        /* Two-Column Form Layout */
+        .form-columns {
             display: grid;
-            grid-template-columns: 150px 1fr;
-            gap: 16px 12px;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 10px;
             align-items: center;
         }
 
         .form-label {
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--text-primary);
             text-align: right;
         }
 
-        .form-input-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .form-input-readonly {
-            width: 100%;
-            max-width: 120px;
-            padding: 8px 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            background-color: var(--cream-bg);
-            border: 1px solid var(--orange-border);
-            border-radius: 4px;
-            text-align: center;
-        }
-
         .form-input-entry {
             width: 100%;
-            padding: 8px 12px;
-            font-size: 0.9rem;
+            padding: 6px 10px;
+            font-size: 0.8rem;
             color: var(--text-primary);
             background-color: var(--cream-bg);
             border: 1px solid var(--orange-border);
@@ -360,62 +358,194 @@
             box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25);
         }
 
-        .btn-create {
-            grid-column: 2;
-            justify-self: start;
-            background-color: var(--navy);
+        .form-input-entry[readonly] {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* Asset Tag Box */
+        .asset-tag-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .tag-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .tag-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-badge-large {
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 1px solid;
+            display: inline-block;
+        }
+
+        .status-active {
+            color: #1b5e20;
+            background-color: rgba(27, 94, 32, 0.1);
+            border-color: #1b5e20;
+        }
+
+        .status-disposed {
+            color: #b91c1c;
+            background-color: rgba(185, 28, 28, 0.1);
+            border-color: #b91c1c;
+        }
+
+        .qr-placeholder {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-image {
+            width: 72px;
+            height: 72px;
+        }
+
+        .btn-print-qr {
+            background-color: #475569;
             color: white;
             border: none;
-            padding: 8px 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
             border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
-        .btn-create:hover {
+        .btn-print-qr:hover {
+            background-color: #334155;
+        }
+
+        /* Data View (Right Panel) table styling */
+        .search-box-container {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .search-btn {
+            background-color: var(--navy);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
             background-color: #0b3c8f;
         }
 
-        /* Status Badge */
-        .status-box {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background-color: var(--success-bg);
-            border: 1px solid var(--success-color);
-            padding: 4px 10px;
+        .assets-table-container {
+            overflow-y: auto;
+            max-height: 520px;
+            border: 1px solid #cbd5e1;
             border-radius: 4px;
+        }
+
+        .assets-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 0.8rem;
         }
 
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            background-color: var(--success-color);
-            border-radius: 50%;
-            display: inline-block;
+        .assets-table th, .assets-table td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .status-text {
-            color: var(--success-color);
+        .assets-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: var(--text-secondary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .asset-row {
+            transition: background-color 0.2s;
+        }
+
+        .asset-row:hover {
+            background-color: #f1f5f9;
+        }
+
+        .select-link {
+            color: var(--navy);
+            text-decoration: none;
             font-weight: 700;
+            cursor: pointer;
+        }
+
+        .select-link:hover {
+            text-decoration: underline;
+            color: var(--maroon);
+        }
+
+        .status-badge-small {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 3px;
             text-transform: uppercase;
         }
 
-        /* Data View empty placeholder */
+        .badge-active {
+            color: #16a34a;
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .badge-disposed {
+            color: #dc2626;
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
+        }
+
         .empty-placeholder {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            min-height: 180px;
+            text-align: center;
             color: var(--text-secondary);
             font-style: italic;
-            font-size: 0.95rem;
-            text-align: center;
+            padding: 20px 0;
         }
 
         /* 6. Bottom Action Bar (Toolbar) */
@@ -468,112 +598,6 @@
         .bg-red { background-color: #ef4444; }
         .bg-blue { background-color: #3b82f6; }
         .bg-gray { background-color: #94a3b8; }
-
-        /* Task List Management container */
-        .tasks-section {
-            margin-top: 12px;
-        }
-
-        .tasks-card-header {
-            background-color: #475569;
-            color: white;
-            padding: 12px 18px;
-            font-weight: 700;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .task-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .task-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 12px 18px;
-            border-radius: 6px;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-
-        .task-item:hover {
-            background-color: #f1f5f9;
-            border-color: #cbd5e1;
-        }
-
-        .task-item.completed {
-            background-color: #f0fdf4;
-            border-color: #bbf7d0;
-        }
-
-        .task-item.completed .task-text {
-            text-decoration: line-through;
-            color: #94a3b8;
-        }
-
-        .task-text {
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .task-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-btn {
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 4px;
-            text-decoration: none;
-            cursor: pointer;
-            border: none;
-            font-family: inherit;
-            transition: background-color 0.2s;
-        }
-
-        .toggle-btn {
-            background-color: var(--accent-primary);
-            color: white;
-        }
-
-        .toggle-btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .task-item.completed .toggle-btn {
-            background-color: #e2e8f0;
-            color: var(--text-primary);
-        }
-
-        .task-item.completed .toggle-btn:hover {
-            background-color: #cbd5e1;
-        }
-
-        .delete-btn {
-            background-color: rgba(220, 38, 38, 0.1);
-            color: #dc2626;
-        }
-
-        .delete-btn:hover {
-            background-color: rgba(220, 38, 38, 0.2);
-        }
-
-        .empty-tasks {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            padding: 30px 0;
-            font-style: italic;
-        }
 
         /* 7. Footer */
         .footer {
@@ -664,7 +688,7 @@
 
         <!-- 4. Page Title Bar -->
         <div class="page-title-bar">
-            <span class="page-title">Dashboard Overview</span>
+            <span class="page-title">Asset Information Form</span>
         </div>
 
         <!-- Main Content Area -->
@@ -675,37 +699,154 @@
                 <div class="card">
                     <div class="card-header data-entry">
                         Data Entry
-                        <!-- Small green bold status badge placeholder -->
-                        <div class="status-box">
-                            <span class="status-indicator"></span>
-                            <span class="status-text">Active</span>
-                        </div>
                     </div>
                     <div class="card-body">
-                        <div class="form-grid">
-                            <!-- Readonly display of stats metrics -->
-                            <label class="form-label">Total Tasks:</label>
-                            <div class="form-input-container">
-                                <asp:TextBox ID="lblTotalTasks" runat="server" ReadOnly="true" CssClass="form-input-readonly">0</asp:TextBox>
+                        <!-- 3. Asset Tag box -->
+                        <div class="asset-tag-box">
+                            <div class="tag-left">
+                                <span class="form-label" style="text-align: left;">Asset Status:</span>
+                                <asp:Label ID="lblStatusText" runat="server" CssClass="status-badge-large status-active">Active</asp:Label>
+                            </div>
+                            <div class="tag-right">
+                                <div class="qr-placeholder">
+                                    <asp:Image ID="imgQRCode" runat="server" CssClass="qr-image" ImageUrl="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=Placeholder" AlternateText="QR Code" />
+                                </div>
+                                <button type="button" class="btn-print-qr" onclick="window.print();">Print Tag</button>
+                            </div>
+                        </div>
+
+                        <!-- 2. Rebuilt Form Fields -->
+                        <div class="form-columns">
+                            <!-- Left Column: Asset Identity & Details -->
+                            <div class="form-column">
+                                <div class="form-row">
+                                    <label class="form-label">Asset ID:</label>
+                                    <asp:TextBox ID="txtAssetId" runat="server" CssClass="form-input-entry" ReadOnly="true"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Asset Description:</label>
+                                    <asp:TextBox ID="txtDescription" runat="server" CssClass="form-input-entry" placeholder="Description of the asset"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Asset Category:</label>
+                                    <asp:TextBox ID="txtCategory" runat="server" CssClass="form-input-entry" placeholder="Category (e.g. Computers)"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Brand:</label>
+                                    <asp:TextBox ID="txtBrand" runat="server" CssClass="form-input-entry" placeholder="e.g. Dell, Steelcase"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Model No.:</label>
+                                    <asp:TextBox ID="txtModelNo" runat="server" CssClass="form-input-entry" placeholder="e.g. Latitude 5420"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Serial No.:</label>
+                                    <asp:TextBox ID="txtSerialNo" runat="server" CssClass="form-input-entry" placeholder="Manufacturer serial number"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Section:</label>
+                                    <asp:TextBox ID="txtSection" runat="server" CssClass="form-input-entry" placeholder="e.g. Academic, IT Support"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Location:</label>
+                                    <asp:TextBox ID="txtLocation" runat="server" CssClass="form-input-entry" placeholder="e.g. Main Library, Room 402"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Employee:</label>
+                                    <asp:TextBox ID="txtEmployee" runat="server" CssClass="form-input-entry" placeholder="Assigned to employee"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Budget utilized from:</label>
+                                    <asp:TextBox ID="txtBudgetUtilizedFrom" runat="server" CssClass="form-input-entry" placeholder="Budget source/grant"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Supplier:</label>
+                                    <asp:TextBox ID="txtSupplier" runat="server" CssClass="form-input-entry" placeholder="Vendor/Supplier name"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Invoice No.:</label>
+                                    <asp:TextBox ID="txtInvoiceNo" runat="server" CssClass="form-input-entry" placeholder="Invoice number"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Contract Sch. No.:</label>
+                                    <asp:TextBox ID="txtContractSchNo" runat="server" CssClass="form-input-entry" placeholder="Maintenance contract no."></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Status Mode:</label>
+                                    <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-input-entry">
+                                        <asp:ListItem Value="Active">Active</asp:ListItem>
+                                        <asp:ListItem Value="Disposed">Disposed</asp:ListItem>
+                                    </asp:DropDownList>
+                                </div>
                             </div>
 
-                            <label class="form-label">Completed Tasks:</label>
-                            <div class="form-input-container">
-                                <asp:TextBox ID="lblCompletedTasks" runat="server" ReadOnly="true" CssClass="form-input-readonly">0</asp:TextBox>
+                            <!-- Right Column: Financials & Dates -->
+                            <div class="form-column">
+                                <div class="form-row">
+                                    <label class="form-label">Original Cost:</label>
+                                    <asp:TextBox ID="txtOriginalCost" runat="server" CssClass="form-input-entry" placeholder="0.00"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Current Value:</label>
+                                    <asp:TextBox ID="txtCurrentValue" runat="server" CssClass="form-input-entry" placeholder="0.00"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Acc. Deprec.:</label>
+                                    <asp:TextBox ID="txtAccDeprec" runat="server" CssClass="form-input-entry" placeholder="0.00"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">FY Opening Bal.:</label>
+                                    <asp:TextBox ID="txtFYOpeningBal" runat="server" CssClass="form-input-entry" placeholder="0.00"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">FY Closing Bal.:</label>
+                                    <asp:TextBox ID="txtFYClosingBal" runat="server" CssClass="form-input-entry" placeholder="0.00"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Dep. Start Date:</label>
+                                    <asp:TextBox ID="txtDepStartDate" runat="server" CssClass="form-input-entry" placeholder="YYYY-MM-DD"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">First Depr. FY:</label>
+                                    <asp:TextBox ID="txtFirstDeprFY" runat="server" CssClass="form-input-entry" placeholder="e.g. 2024-2025"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Last Depr. FY:</label>
+                                    <asp:TextBox ID="txtLastDeprFY" runat="server" CssClass="form-input-entry" placeholder="e.g. 2029-2030"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Purchase Date:</label>
+                                    <asp:TextBox ID="txtPurchaseDate" runat="server" CssClass="form-input-entry" placeholder="YYYY-MM-DD"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Purchase FY:</label>
+                                    <asp:TextBox ID="txtPurchaseFY" runat="server" CssClass="form-input-entry" placeholder="e.g. 2024-2025"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Warranty Exp.:</label>
+                                    <asp:TextBox ID="txtWarrantyExp" runat="server" CssClass="form-input-entry" placeholder="YYYY-MM-DD"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Disposal Date:</label>
+                                    <asp:TextBox ID="txtDisposalDate" runat="server" CssClass="form-input-entry" placeholder="YYYY-MM-DD"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Dispos. Reason:</label>
+                                    <asp:TextBox ID="txtDisposalReason" runat="server" CssClass="form-input-entry" placeholder="Reason if disposed"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Remarks:</label>
+                                    <asp:TextBox ID="txtRemarks" runat="server" CssClass="form-input-entry" placeholder="Any additional notes"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Enter By:</label>
+                                    <asp:TextBox ID="txtEnterBy" runat="server" CssClass="form-input-entry" placeholder="Operator name"></asp:TextBox>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Entry Date:</label>
+                                    <asp:TextBox ID="txtEntryDate" runat="server" CssClass="form-input-entry" placeholder="YYYY-MM-DD"></asp:TextBox>
+                                </div>
                             </div>
-
-                            <label class="form-label">Efficiency Metric:</label>
-                            <div class="form-input-container">
-                                <asp:TextBox ID="lblEfficiency" runat="server" ReadOnly="true" CssClass="form-input-readonly">0%</asp:TextBox>
-                            </div>
-
-                            <!-- Interactive Task Entry Row -->
-                            <label class="form-label">New Task Name:</label>
-                            <div class="form-input-container">
-                                <asp:TextBox ID="txtTaskName" runat="server" CssClass="form-input-entry" placeholder="e.g., Verify science lab equipment assets" AutoCompleteType="Disabled"></asp:TextBox>
-                            </div>
-
-                            <asp:Button ID="btnAddTask" runat="server" Text="Create Task Entry" CssClass="btn-create" OnClick="btnAddTask_Click" />
                         </div>
                     </div>
                 </div>
@@ -716,52 +857,85 @@
                         Data View
                     </div>
                     <div class="card-body">
-                        <!-- Empty placeholder content for data view -->
-                        <div class="empty-placeholder">
-                            No data selected
+                        <!-- Search filtering container -->
+                        <div class="search-box-container">
+                            <asp:TextBox ID="txtSearchQuery" runat="server" placeholder="Search by ID or Desc..." CssClass="search-input"></asp:TextBox>
+                            <asp:Button ID="btnPerformSearch" runat="server" Text="Search" OnClick="btnSearch_Click" CssClass="search-btn" />
+                        </div>
+
+                        <!-- 4. Data View list -->
+                        <div class="assets-table-container">
+                            <table class="assets-table">
+                                <thead>
+                                    <tr>
+                                        <th>Asset ID</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <asp:Repeater ID="rptAssets" runat="server" OnItemCommand="rptAssets_ItemCommand">
+                                        <ItemTemplate>
+                                            <tr class="asset-row">
+                                                <td>
+                                                    <asp:LinkButton ID="lnkSelect" runat="server" CommandName="Select" CommandArgument='<%# Eval("AssetId") %>' Text='<%# Eval("AssetId") %>' CssClass="select-link" />
+                                                </td>
+                                                <td><%# HttpUtility.HtmlEncode(Eval("Description")) %></td>
+                                                <td>
+                                                    <span class="status-badge-small <%# If(Eval("Status").ToString() = "Active", "badge-active", "badge-disposed") %>">
+                                                        <%# Eval("Status") %>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                </tbody>
+                            </table>
+                            <asp:Panel ID="pnlNoAssets" runat="server" Visible="false" CssClass="empty-placeholder">
+                                No assets match this search.
+                            </asp:Panel>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Hidden panel to keep controls active in code-behind but invisible on page -->
+            <!-- Hidden container to keep old task-manager structures compile-friendly but completely invisible -->
             <asp:Panel ID="pnlHiddenTasks" runat="server" Visible="false">
+                <asp:TextBox ID="txtTaskName" runat="server"></asp:TextBox>
+                <asp:Button ID="btnAddTask" runat="server" OnClick="btnAddTask_Click" />
                 <asp:Repeater ID="rptTasks" runat="server" OnItemCommand="rptTasks_ItemCommand">
-                    <HeaderTemplate>
-                        <ul class="task-list">
-                    </HeaderTemplate>
-                    <ItemTemplate>
-                        <li class="task-item <%# If(Convert.ToBoolean(Eval("IsCompleted")), "completed", "") %>">
-                            <span class="task-text"><%# HttpUtility.HtmlEncode(Eval("Name")) %></span>
-                            <div class="task-actions">
-                                <asp:LinkButton ID="btnToggle" runat="server" CommandName="Toggle" CommandArgument='<%# Eval("Id") %>' CssClass="action-btn toggle-btn" Text='<%# If(Convert.ToBoolean(Eval("IsCompleted")), "Undo", "Complete") %>' />
-                                <asp:LinkButton ID="btnDelete" runat="server" CommandName="Delete" CommandArgument='<%# Eval("Id") %>' CssClass="action-btn delete-btn" Text="Delete" />
-                            </div>
-                        </li>
-                    </ItemTemplate>
-                    <FooterTemplate>
-                        </ul>
-                    </FooterTemplate>
+                    <ItemTemplate></ItemTemplate>
                 </asp:Repeater>
-                
-                <asp:Panel ID="pnlNoTasks" runat="server" Visible="true" CssClass="empty-tasks">
-                    No tasks in progress. Create your first task entry above to get started!
-                </asp:Panel>
+                <asp:Panel ID="pnlNoTasks" runat="server"></asp:Panel>
             </asp:Panel>
         </main>
 
         <!-- 6. Bottom Action Bar (Toolbar) -->
         <div class="action-toolbar">
-            <button type="button" class="toolbar-btn" onclick="alert('New item action triggered (TODO)');"><span class="btn-icon-block bg-green"></span>New</button>
-            <button type="button" class="toolbar-btn" onclick="alert('Edit action triggered (TODO)');"><span class="btn-icon-block bg-orange"></span>Edit</button>
-            <button type="button" class="toolbar-btn" onclick="alert('Delete action triggered (TODO)');"><span class="btn-icon-block bg-red"></span>Delete</button>
-            <button type="button" class="toolbar-btn" onclick="alert('Save action triggered (TODO)');"><span class="btn-icon-block bg-blue"></span>Save</button>
-            <button type="button" class="toolbar-btn" onclick="alert('Cancel action triggered (TODO)');"><span class="btn-icon-block bg-gray"></span>Cancel</button>
-            <button type="button" class="toolbar-btn" onclick="alert('Search action triggered (TODO)');"><span class="btn-icon-block bg-gray"></span>Search</button>
-            <button type="button" class="toolbar-btn" onclick="alert('Print report action triggered (TODO)');"><span class="btn-icon-block bg-gray"></span>Print</button>
-            
-            <!-- Exit button wires to Logout (clears session and redirects) -->
-            <asp:LinkButton ID="btnExit" runat="server" CssClass="toolbar-btn" OnClick="btnLogout_Click" UseSubmitBehavior="false"><span class="btn-icon-block bg-red"></span>Exit</asp:LinkButton>
+            <asp:LinkButton ID="btnNew" runat="server" CssClass="toolbar-btn" OnClick="btnNew_Click" UseSubmitBehavior="false">
+                <span class="btn-icon-block bg-green"></span>New
+            </asp:LinkButton>
+            <asp:LinkButton ID="btnEdit" runat="server" CssClass="toolbar-btn" OnClick="btnEdit_Click" UseSubmitBehavior="false">
+                <span class="btn-icon-block bg-orange"></span>Edit
+            </asp:LinkButton>
+            <asp:LinkButton ID="btnDelete" runat="server" CssClass="toolbar-btn" OnClick="btnDelete_Click" UseSubmitBehavior="false" OnClientClick="return confirm('Are you sure you want to delete this asset?');">
+                <span class="btn-icon-block bg-red"></span>Delete
+            </asp:LinkButton>
+            <asp:LinkButton ID="btnSave" runat="server" CssClass="toolbar-btn" OnClick="btnSave_Click" UseSubmitBehavior="false">
+                <span class="btn-icon-block bg-blue"></span>Save
+            </asp:LinkButton>
+            <asp:LinkButton ID="btnCancel" runat="server" CssClass="toolbar-btn" OnClick="btnCancel_Click" UseSubmitBehavior="false">
+                <span class="btn-icon-block bg-gray"></span>Cancel
+            </asp:LinkButton>
+            <asp:LinkButton ID="btnSearch" runat="server" CssClass="toolbar-btn" OnClick="btnSearch_Click" UseSubmitBehavior="false">
+                <span class="btn-icon-block bg-gray"></span>Search
+            </asp:LinkButton>
+            <asp:LinkButton ID="btnPrint" runat="server" CssClass="toolbar-btn" OnClientClick="window.print(); return false;" UseSubmitBehavior="false">
+                <span class="btn-icon-block bg-gray"></span>Print
+            </asp:LinkButton>
+            <asp:LinkButton ID="btnExit" runat="server" CssClass="toolbar-btn" OnClick="btnLogout_Click" UseSubmitBehavior="false">
+                <span class="btn-icon-block bg-red"></span>Exit
+            </asp:LinkButton>
         </div>
 
         <!-- 7. Footer -->
