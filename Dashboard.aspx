@@ -604,8 +604,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent dark background overlay */
             z-index: 1000;
             display: flex;
@@ -614,6 +614,10 @@
         }
 
         .modal-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             background-color: #ffffff;
             border: 1px solid var(--card-border);
             border-radius: 8px;
@@ -627,8 +631,38 @@
         }
 
         @keyframes modalFadeIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            from { transform: translate(-50%, -50%) scale(0.95); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .modal-search-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 10px 8px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .modal-label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .modal-input:focus {
+            border-color: var(--orange-border);
         }
 
         .modal-header {
@@ -1093,7 +1127,7 @@
             <asp:LinkButton ID="btnCancel" runat="server" CssClass="toolbar-btn" OnClick="btnCancel_Click" UseSubmitBehavior="false">
                 <span class="btn-icon-block bg-gray"></span>Cancel
             </asp:LinkButton>
-            <asp:LinkButton ID="btnSearch" runat="server" CssClass="toolbar-btn" OnClientClick="openSearchModal(); return false;" UseSubmitBehavior="false">
+            <asp:LinkButton ID="btnSearch" runat="server" CssClass="toolbar-btn" OnClick="btnSearchOpen_Click" UseSubmitBehavior="false">
                 <span class="btn-icon-block bg-gray"></span>Search
             </asp:LinkButton>
             <asp:LinkButton ID="btnPrint" runat="server" CssClass="toolbar-btn" OnClientClick="window.print(); return false;" UseSubmitBehavior="false">
@@ -1105,16 +1139,31 @@
         </div>
 
         <!-- Overlay for Search Modal -->
-        <div id="searchModalOverlay" class="modal-overlay" style="display:none;">
+        <div id="searchModalOverlay" class="modal-overlay" style='<%= If(IsSearchModalOpen, "display:flex;", "display:none;") %>'>
             <div id="searchModalBox" class="modal-box">
                 <div class="modal-header">
                     <span class="modal-title">Search Assets</span>
-                    <button type="button" class="modal-close-btn" onclick="closeSearchModal();">✕</button>
+                    <asp:LinkButton ID="btnModalClose" runat="server" OnClick="btnCloseModal_Click" CssClass="modal-close-btn" Text="✕" UseSubmitBehavior="false" />
                 </div>
                 <div class="modal-body">
-                    <div class="modal-search-inputs">
-                        <input type="text" id="txtModalSearch" placeholder="Search by ID or Description..." class="modal-search-input" onkeyup="filterModalAssets();" />
-                        <button type="button" class="modal-search-btn" onclick="filterModalAssets();">Search</button>
+                    <div class="modal-search-grid">
+                        <label class="modal-label">Asset ID:</label>
+                        <asp:TextBox ID="txtModalAssetId" runat="server" CssClass="modal-input" placeholder="Partial match..."></asp:TextBox>
+                        
+                        <label class="modal-label">Purchase Date:</label>
+                        <asp:TextBox ID="txtModalPurchaseDate" runat="server" CssClass="modal-input" placeholder="dd/MM/yyyy"></asp:TextBox>
+                        
+                        <label class="modal-label">Brand:</label>
+                        <asp:TextBox ID="txtModalBrand" runat="server" CssClass="modal-input" placeholder="Partial match..."></asp:TextBox>
+                        
+                        <label class="modal-label">Category:</label>
+                        <asp:TextBox ID="txtModalCategory" runat="server" CssClass="modal-input" placeholder="Partial match..."></asp:TextBox>
+                        
+                        <label class="modal-label">Section:</label>
+                        <asp:TextBox ID="txtModalSection" runat="server" CssClass="modal-input" placeholder="Partial match..."></asp:TextBox>
+                    </div>
+                    <div style="text-align: right; margin-bottom: 8px;">
+                        <asp:Button ID="btnModalSearch" runat="server" Text="Search" OnClick="btnModalSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
                     </div>
                     <div class="modal-results-container">
                         <table class="modal-results-table">
@@ -1125,103 +1174,42 @@
                                     <th>Status</th>
                                 </tr>
                             </thead>
-                            <tbody id="modalResultsBody">
-                                <!-- Dynamically populated by JS -->
+                            <tbody>
+                                <asp:Repeater ID="rptModalResults" runat="server" OnItemCommand="rptModalResults_ItemCommand">
+                                    <ItemTemplate>
+                                        <tr class="modal-row" onclick="var link = document.getElementById('<%# CType(Container.FindControl("lnkSelectModalAsset"), LinkButton).ClientID %>'); if(link) link.click();">
+                                            <td class="modal-row-id">
+                                                <asp:LinkButton ID="lnkSelectModalAsset" runat="server" CommandName="Select" CommandArgument='<%# Eval("AssetId") %>' Text='<%# Eval("AssetId") %>' style="display:none;" />
+                                                <%# Eval("AssetId") %>
+                                            </td>
+                                            <td><%# HttpUtility.HtmlEncode(Eval("Description")) %></td>
+                                            <td>
+                                                <span class="status-badge-small <%# If(Eval("Status").ToString() = "Active", "badge-active", "badge-disposed") %>">
+                                                    <%# Eval("Status") %>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </ItemTemplate>
+                                </asp:Repeater>
                             </tbody>
                         </table>
-                        <div id="divNoModalResults" class="modal-no-results" style="display:none;">
+                        <asp:Panel ID="pnlNoModalResults" runat="server" Visible="false" CssClass="modal-no-results">
                             No assets matched your search.
-                        </div>
+                        </asp:Panel>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="modal-footer-cancel-btn" onclick="closeSearchModal();">Cancel</button>
+                    <asp:LinkButton ID="btnModalCancel" runat="server" OnClick="btnCloseModal_Click" CssClass="modal-footer-cancel-btn" Text="Cancel" UseSubmitBehavior="false" />
                 </div>
             </div>
         </div>
 
-        <!-- Hidden postback controls for loading selected asset -->
-        <asp:HiddenField ID="hdnSelectedAssetId" runat="server" />
-        <asp:Button ID="btnLoadAsset" runat="server" OnClick="btnLoadAsset_Click" Style="display:none;" UseSubmitBehavior="false" />
+        <!-- Hidden button for double-click closing postback -->
+        <asp:Button ID="btnCloseModal" runat="server" OnClick="btnCloseModal_Click" Style="display:none;" UseSubmitBehavior="false" />
 
         <script type="text/javascript">
-            function openSearchModal() {
-                var overlay = document.getElementById("searchModalOverlay");
-                overlay.style.display = "flex";
-                
-                // Clear input and focus
-                var searchInput = document.getElementById("txtModalSearch");
-                searchInput.value = "";
-                searchInput.focus();
-                
-                // Render all items initially
-                filterModalAssets();
-            }
-
-            function closeSearchModal() {
-                document.getElementById("searchModalOverlay").style.display = "none";
-            }
-
-            function filterModalAssets() {
-                var query = document.getElementById("txtModalSearch").value.toLowerCase().trim();
-                var tbody = document.getElementById("modalResultsBody");
-                var noResults = document.getElementById("divNoModalResults");
-                
-                tbody.innerHTML = "";
-                
-                var filtered = [];
-                if (typeof assetsJson !== 'undefined') {
-                    filtered = assetsJson;
-                }
-                
-                if (query !== "") {
-                    filtered = filtered.filter(function(a) {
-                        return a.AssetId.toLowerCase().includes(query) || 
-                               a.Description.toLowerCase().includes(query);
-                    });
-                }
-                
-                if (filtered.length === 0) {
-                    noResults.style.display = "block";
-                } else {
-                    noResults.style.display = "none";
-                    filtered.forEach(function(a) {
-                        var tr = document.createElement("tr");
-                        tr.className = "modal-row";
-                        
-                        tr.onclick = function() {
-                            selectModalAsset(a.AssetId);
-                        };
-                        
-                        var tdId = document.createElement("td");
-                        tdId.className = "modal-row-id";
-                        tdId.innerText = a.AssetId;
-                        
-                        var tdDesc = document.createElement("td");
-                        tdDesc.innerText = a.Description;
-                        
-                        var tdStatus = document.createElement("td");
-                        var span = document.createElement("span");
-                        span.className = "status-badge-small " + (a.Status === "Active" ? "badge-active" : "badge-disposed");
-                        span.innerText = a.Status;
-                        tdStatus.appendChild(span);
-                        
-                        tr.appendChild(tdId);
-                        tr.appendChild(tdDesc);
-                        tr.appendChild(tdStatus);
-                        tbody.appendChild(tr);
-                    });
-                }
-            }
-
-            function selectModalAsset(assetId) {
-                closeSearchModal();
-                document.getElementById("<%= hdnSelectedAssetId.ClientID %>").value = assetId;
-                document.getElementById("<%= btnLoadAsset.ClientID %>").click();
-            }
-
             // Click-outside behavior:
-            // Clicks inside modal box stop propagation.
+            // Clicks/Double-clicks inside modal box stop propagation.
             // Double-click on overlay closes the modal.
             document.addEventListener("DOMContentLoaded", function() {
                 var overlay = document.getElementById("searchModalOverlay");
@@ -1236,7 +1224,8 @@
                     });
                     
                     overlay.addEventListener("dblclick", function(e) {
-                        closeSearchModal();
+                        // Trigger server postback to close the modal and update state
+                        document.getElementById("<%= btnCloseModal.ClientID %>").click();
                     });
                 }
             });

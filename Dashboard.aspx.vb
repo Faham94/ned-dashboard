@@ -50,7 +50,7 @@ Partial Public Class DashboardPage
         If Session("AssetList") Is Nothing Then
             Dim initialList As New List(Of AssetItem)()
             
-            ' Seed mock data to populate list
+            ' Seed mock data to populate list (9 assets total)
             initialList.Add(New AssetItem() With {
                 .AssetId = "0000000001",
                 .Description = "Bending Machine",
@@ -211,16 +211,138 @@ Partial Public Class DashboardPage
                 .EnterBy = "faham_admin",
                 .EntryDate = "2024-06-15"
             })
+            initialList.Add(New AssetItem() With {
+                .AssetId = "0000000006",
+                .Description = "Oscilloscope Pro",
+                .Category = "Computers & Electronics",
+                .Brand = "Tektronix",
+                .ModelNo = "TBS1052B",
+                .SerialNo = "TEK-90088",
+                .Section = "Electronics Lab",
+                .Location = "Lab Room 202",
+                .Employee = "Dr. Nikola Tesla",
+                .BudgetUtilizedFrom = "Research Grant B",
+                .Supplier = "Tektronix Corp",
+                .InvoiceNo = "INV-554411",
+                .ContractSchNo = "N/A",
+                .OriginalCost = 2800.00D,
+                .CurrentValue = 2400.00D,
+                .AccDeprec = 400.00D,
+                .FYOpeningBal = 2800.00D,
+                .FYClosingBal = 2400.00D,
+                .DepStartDate = "2024-06-01",
+                .FirstDeprFY = "2024-2025",
+                .LastDeprFY = "2029-2030",
+                .PurchaseDate = "2024-05-20",
+                .PurchaseFY = "2024-2025",
+                .WarrantyExp = "2027-05-20",
+                .DisposalDate = "",
+                .DisposalReason = "",
+                .Remarks = "Calibrated Tektronix Oscilloscope.",
+                .Status = "Active",
+                .EnterBy = "faham_admin",
+                .EntryDate = "2024-05-20"
+            })
+            initialList.Add(New AssetItem() With {
+                .AssetId = "0000000007",
+                .Description = "DeWalt Mitre Saw 12 Inch",
+                .Category = "Power Tools",
+                .Brand = "DeWalt",
+                .ModelNo = "DWS779",
+                .SerialNo = "DW-33445",
+                .Section = "Woodworking Shop",
+                .Location = "Maintenance Workshop",
+                .Employee = "Bob Builder",
+                .BudgetUtilizedFrom = "Facilities Budget",
+                .Supplier = "Home Depot Pro",
+                .InvoiceNo = "INV-7865",
+                .ContractSchNo = "N/A",
+                .OriginalCost = 650.00D,
+                .CurrentValue = 450.00D,
+                .AccDeprec = 200.00D,
+                .FYOpeningBal = 650.00D,
+                .FYClosingBal = 450.00D,
+                .DepStartDate = "2023-12-01",
+                .FirstDeprFY = "2023-2024",
+                .LastDeprFY = "2028-2029",
+                .PurchaseDate = "2023-11-05",
+                .PurchaseFY = "2023-2024",
+                .WarrantyExp = "2026-11-05",
+                .DisposalDate = "",
+                .DisposalReason = "",
+                .Remarks = "Heavy duty workshop saw.",
+                .Status = "Active",
+                .EnterBy = "faham_admin",
+                .EntryDate = "2023-11-05"
+            })
+            initialList.Add(New AssetItem() With {
+                .AssetId = "0000000008",
+                .Description = "Office Desk Organizer",
+                .Category = "Office Furniture",
+                .Brand = "n/a",
+                .ModelNo = "ORG-01",
+                .SerialNo = "N/A",
+                .Section = "Admin Dept",
+                .Location = "Main Reception Desk",
+                .Employee = "Receptionist",
+                .BudgetUtilizedFrom = "General Budget",
+                .Supplier = "Local Stationers",
+                .InvoiceNo = "INV-902",
+                .ContractSchNo = "N/A",
+                .OriginalCost = 85.00D,
+                .CurrentValue = 75.00D,
+                .AccDeprec = 10.00D,
+                .FYOpeningBal = 85.00D,
+                .FYClosingBal = 75.00D,
+                .DepStartDate = "2025-04-01",
+                .FirstDeprFY = "2025-2026",
+                .LastDeprFY = "2029-2030",
+                .PurchaseDate = "2025-03-12",
+                .PurchaseFY = "2024-2025",
+                .WarrantyExp = "2026-03-12",
+                .DisposalDate = "",
+                .DisposalReason = "",
+                .Remarks = "Basic plastic desk organizer.",
+                .Status = "Active",
+                .EnterBy = "faham_admin",
+                .EntryDate = "2025-03-12"
+            })
+            initialList.Add(New AssetItem() With {
+                .AssetId = "0000000009",
+                .Description = "HP EliteDesk Desktop PC",
+                .Category = "Computers & Electronics",
+                .Brand = "HP",
+                .ModelNo = "EliteDesk 800",
+                .SerialNo = "HP-ED-7788",
+                .Section = "IT Dept",
+                .Location = "IT Support Room",
+                .Employee = "Helpdesk Operator",
+                .BudgetUtilizedFrom = "Department Grant FY25",
+                .Supplier = "HP Direct",
+                .InvoiceNo = "INV-998899",
+                .ContractSchNo = "MNT-HP-2025",
+                .OriginalCost = 1100.00D,
+                .CurrentValue = 950.00D,
+                .AccDeprec = 150.00D,
+                .FYOpeningBal = 1100.00D,
+                .FYClosingBal = 950.00D,
+                .DepStartDate = "2025-03-01",
+                .FirstDeprFY = "2024-2025",
+                .LastDeprFY = "2029-2030",
+                .PurchaseDate = "2025-02-28",
+                .PurchaseFY = "2024-2025",
+                .WarrantyExp = "2028-02-28",
+                .DisposalDate = "",
+                .DisposalReason = "",
+                .Remarks = "IT support agent desktop PC.",
+                .Status = "Active",
+                .EnterBy = "faham_admin",
+                .EntryDate = "2025-02-28"
+            })
             Session("AssetList") = initialList
         End If
 
-        ' Always register the latest assets list JSON for the client-side search modal
         Dim assetsList As List(Of AssetItem) = CType(Session("AssetList"), List(Of AssetItem))
-        If assetsList IsNot Nothing Then
-            Dim json As String = GetAssetsJson(assetsList)
-            Dim script As String = "var assetsJson = " & json & ";"
-            ClientScript.RegisterStartupScript(Me.GetType(), "assetsJson", script, True)
-        End If
 
         If Not IsPostBack Then
             ' 3. Populate university dashboard labels
@@ -607,6 +729,100 @@ Partial Public Class DashboardPage
         Return 0
     End Function
 
+    Public Property IsSearchModalOpen As Boolean
+        Get
+            If ViewState("IsSearchModalOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsSearchModalOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsSearchModalOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnSearchOpen_Click(sender As Object, e As EventArgs)
+        txtModalAssetId.Text = String.Empty
+        txtModalPurchaseDate.Text = String.Empty
+        txtModalBrand.Text = String.Empty
+        txtModalCategory.Text = String.Empty
+        txtModalSection.Text = String.Empty
+        
+        BindModalAssetList()
+        IsSearchModalOpen = True
+    End Sub
+
+    Protected Sub btnModalSearch_Click(sender As Object, e As EventArgs)
+        BindModalAssetList()
+        IsSearchModalOpen = True
+    End Sub
+
+    Protected Sub btnCloseModal_Click(sender As Object, e As EventArgs)
+        IsSearchModalOpen = False
+    End Sub
+
+    Protected Sub rptModalResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim assetId As String = e.CommandArgument.ToString()
+            LoadAsset(assetId)
+            IsSearchModalOpen = False
+        End If
+    End Sub
+
+    Private Sub BindModalAssetList()
+        Dim assets As List(Of AssetItem) = CType(Session("AssetList"), List(Of AssetItem))
+        If assets Is Nothing Then
+            assets = New List(Of AssetItem)()
+        End If
+
+        Dim filtered As IEnumerable(Of AssetItem) = assets
+
+        ' 1. Asset ID filter (partial contains)
+        Dim searchId As String = txtModalAssetId.Text.Trim()
+        If Not String.IsNullOrEmpty(searchId) Then
+            filtered = filtered.Where(Function(a) a.AssetId.IndexOf(searchId, StringComparison.OrdinalIgnoreCase) >= 0)
+        End If
+
+        ' 2. Brand filter (partial contains)
+        Dim searchBrand As String = txtModalBrand.Text.Trim()
+        If Not String.IsNullOrEmpty(searchBrand) Then
+            filtered = filtered.Where(Function(a) a.Brand.IndexOf(searchBrand, StringComparison.OrdinalIgnoreCase) >= 0)
+        End If
+
+        ' 3. Category filter (partial contains)
+        Dim searchCategory As String = txtModalCategory.Text.Trim()
+        If Not String.IsNullOrEmpty(searchCategory) Then
+            filtered = filtered.Where(Function(a) a.Category.IndexOf(searchCategory, StringComparison.OrdinalIgnoreCase) >= 0)
+        End If
+
+        ' 4. Section filter (partial contains)
+        Dim searchSection As String = txtModalSection.Text.Trim()
+        If Not String.IsNullOrEmpty(searchSection) Then
+            filtered = filtered.Where(Function(a) a.Section.IndexOf(searchSection, StringComparison.OrdinalIgnoreCase) >= 0)
+        End If
+
+        ' 5. Purchase Date filter (exact date matching, parsed using dd/MM/yyyy)
+        Dim searchDateStr As String = txtModalPurchaseDate.Text.Trim()
+        If Not String.IsNullOrEmpty(searchDateStr) Then
+            Dim parsedDate As DateTime
+            If DateTime.TryParseExact(searchDateStr, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, parsedDate) Then
+                filtered = filtered.Where(Function(a)
+                    Dim assetDate As DateTime
+                    If DateTime.TryParse(a.PurchaseDate, assetDate) Then
+                        Return assetDate.Date = parsedDate.Date
+                    End If
+                    Return False
+                End Function)
+            End If
+        End If
+
+        Dim resultList = filtered.ToList()
+        rptModalResults.DataSource = resultList
+        rptModalResults.DataBind()
+
+        pnlNoModalResults.Visible = (resultList.Count = 0)
+    End Sub
+
     ' Stubs for legacy task control compiler-friendliness
     Protected Sub btnAddTask_Click(sender As Object, e As EventArgs)
         ' Legacy handler stub (no functional implementation needed)
@@ -615,30 +831,4 @@ Partial Public Class DashboardPage
     Protected Sub rptTasks_ItemCommand(source As Object, e As Global.System.Web.UI.WebControls.RepeaterCommandEventArgs)
         ' Legacy handler stub (no functional implementation needed)
     End Sub
-
-    Protected Sub btnLoadAsset_Click(sender As Object, e As EventArgs)
-        Dim assetId As String = hdnSelectedAssetId.Value.Trim()
-        If Not String.IsNullOrEmpty(assetId) Then
-            LoadAsset(assetId)
-        End If
-    End Sub
-
-    Private Function GetAssetsJson(assets As List(Of AssetItem)) As String
-        Dim sb As New System.Text.StringBuilder()
-        sb.Append("[")
-        For i As Integer = 0 To assets.Count - 1
-            Dim a = assets(i)
-            Dim desc As String = a.Description.Replace("\", "\\").Replace("""", "\""").Replace(vbCr, " ").Replace(vbLf, " ")
-            sb.Append("{")
-            sb.AppendFormat("""AssetId"":""{0}"",", a.AssetId)
-            sb.AppendFormat("""Description"":""{0}"",", desc)
-            sb.AppendFormat("""Status"":""{0}""", a.Status)
-            sb.Append("}")
-            If i < assets.Count - 1 Then
-                sb.Append(",")
-            End If
-        Next
-        sb.Append("]")
-        Return sb.ToString()
-    End Function
 End Class
