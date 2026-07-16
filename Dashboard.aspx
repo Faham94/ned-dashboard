@@ -809,9 +809,16 @@
         .modal-footer-cancel-btn:hover {
             background-color: #cbd5e1;
         }
+
+        body.no-scroll {
+            overflow: hidden !important;
+            height: 100vh !important;
+            width: 100vw !important;
+            position: fixed !important;
+        }
     </style>
 </head>
-<body>
+<body class='<%= If(IsSearchModalOpen, "no-scroll", "") %>'>
     <form id="form1" runat="server">
         <!-- 1. Top Header Bar -->
         <header class="top-header">
@@ -1227,6 +1234,13 @@
                         // Trigger server postback to close the modal and update state
                         document.getElementById("<%= btnCloseModal.ClientID %>").click();
                     });
+
+                    // Prevent viewport touch-dragging / background scroll on touch screens
+                    overlay.addEventListener("touchmove", function(e) {
+                        if (!e.target.closest(".modal-results-container")) {
+                            e.preventDefault();
+                        }
+                    }, { passive: false });
                 }
             });
         </script>
