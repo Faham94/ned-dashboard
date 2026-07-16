@@ -486,40 +486,40 @@ Partial Public Class DashboardPage
         imgQRCode.ImageUrl = "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=NEW_ASSET"
     End Sub
 
-    Private Sub SetFormReadOnly(readOnly As Boolean)
+    Private Sub SetFormReadOnly(isReadOnly As Boolean)
         txtAssetId.ReadOnly = True ' Always read-only because it's auto-generated
-        txtDescription.ReadOnly = readOnly
-        txtCategory.ReadOnly = readOnly
-        txtBrand.ReadOnly = readOnly
-        txtModelNo.ReadOnly = readOnly
-        txtSerialNo.ReadOnly = readOnly
-        txtSection.ReadOnly = readOnly
-        txtLocation.ReadOnly = readOnly
-        txtEmployee.ReadOnly = readOnly
-        txtBudgetUtilizedFrom.ReadOnly = readOnly
-        txtSupplier.ReadOnly = readOnly
-        txtInvoiceNo.ReadOnly = readOnly
-        txtContractSchNo.ReadOnly = readOnly
+        txtDescription.ReadOnly = isReadOnly
+        txtCategory.ReadOnly = isReadOnly
+        txtBrand.ReadOnly = isReadOnly
+        txtModelNo.ReadOnly = isReadOnly
+        txtSerialNo.ReadOnly = isReadOnly
+        txtSection.ReadOnly = isReadOnly
+        txtLocation.ReadOnly = isReadOnly
+        txtEmployee.ReadOnly = isReadOnly
+        txtBudgetUtilizedFrom.ReadOnly = isReadOnly
+        txtSupplier.ReadOnly = isReadOnly
+        txtInvoiceNo.ReadOnly = isReadOnly
+        txtContractSchNo.ReadOnly = isReadOnly
         
-        txtOriginalCost.ReadOnly = readOnly
-        txtCurrentValue.ReadOnly = readOnly
-        txtAccDeprec.ReadOnly = readOnly
-        txtFYOpeningBal.ReadOnly = readOnly
-        txtFYClosingBal.ReadOnly = readOnly
+        txtOriginalCost.ReadOnly = isReadOnly
+        txtCurrentValue.ReadOnly = isReadOnly
+        txtAccDeprec.ReadOnly = isReadOnly
+        txtFYOpeningBal.ReadOnly = isReadOnly
+        txtFYClosingBal.ReadOnly = isReadOnly
         
-        txtDepStartDate.ReadOnly = readOnly
-        txtFirstDeprFY.ReadOnly = readOnly
-        txtLastDeprFY.ReadOnly = readOnly
-        txtPurchaseDate.ReadOnly = readOnly
-        txtPurchaseFY.ReadOnly = readOnly
-        txtWarrantyExp.ReadOnly = readOnly
-        txtDisposalDate.ReadOnly = readOnly
-        txtDisposalReason.ReadOnly = readOnly
-        txtRemarks.ReadOnly = readOnly
-        txtEnterBy.ReadOnly = readOnly
-        txtEntryDate.ReadOnly = readOnly
+        txtDepStartDate.ReadOnly = isReadOnly
+        txtFirstDeprFY.ReadOnly = isReadOnly
+        txtLastDeprFY.ReadOnly = isReadOnly
+        txtPurchaseDate.ReadOnly = isReadOnly
+        txtPurchaseFY.ReadOnly = isReadOnly
+        txtWarrantyExp.ReadOnly = isReadOnly
+        txtDisposalDate.ReadOnly = isReadOnly
+        txtDisposalReason.ReadOnly = isReadOnly
+        txtRemarks.ReadOnly = isReadOnly
+        txtEnterBy.ReadOnly = isReadOnly
+        txtEntryDate.ReadOnly = isReadOnly
         
-        ddlStatus.Enabled = Not readOnly
+        ddlStatus.Enabled = Not isReadOnly
     End Sub
 
     Private Sub UpdateStatusBadge(status As String)
