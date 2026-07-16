@@ -1,0 +1,11 @@
+# Compiled binaries
+Server.exe
+ServerLib.dll
+
+# Build output directories
+bin/
+
+# Temporary / User specific files
+.vs/
+*.suo
+*.user
