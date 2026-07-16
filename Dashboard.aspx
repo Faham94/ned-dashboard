@@ -599,15 +599,181 @@
         .bg-blue { background-color: #3b82f6; }
         .bg-gray { background-color: #94a3b8; }
 
-        /* 7. Footer */
-        .footer {
+        /* Search Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent dark background overlay */
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
             background-color: #ffffff;
-            border-top: 1px solid var(--card-border);
-            padding: 14px;
-            text-align: center;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            width: 480px;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            background-color: var(--data-entry-header);
+            color: #ffffff;
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            opacity: 0.8;
+        }
+
+        .modal-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-search-inputs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .modal-search-input {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .modal-search-input:focus {
+            border-color: var(--orange-border);
+        }
+
+        .modal-search-btn {
+            background-color: var(--navy);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modal-search-btn:hover {
+            background-color: #0b3c8f;
+        }
+
+        .modal-results-container {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .modal-results-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 0.8rem;
+        }
+
+        .modal-results-table th, .modal-results-table td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-results-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
             color: var(--text-secondary);
-            margin-top: auto;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .modal-row {
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+
+        .modal-row:hover {
+            background-color: #f1f5f9;
+        }
+
+        .modal-row-id {
+            color: var(--navy);
+            font-weight: 700;
+        }
+
+        .modal-no-results {
+            padding: 16px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+
+        .modal-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #cbd5e1;
+            display: flex;
+            justify-content: flex-end;
+            background-color: #f8fafc;
+        }
+
+        .modal-footer-cancel-btn {
+            background-color: #e2e8f0;
+            color: var(--text-primary);
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modal-footer-cancel-btn:hover {
+            background-color: #cbd5e1;
         }
     </style>
 </head>
@@ -927,7 +1093,7 @@
             <asp:LinkButton ID="btnCancel" runat="server" CssClass="toolbar-btn" OnClick="btnCancel_Click" UseSubmitBehavior="false">
                 <span class="btn-icon-block bg-gray"></span>Cancel
             </asp:LinkButton>
-            <asp:LinkButton ID="btnSearch" runat="server" CssClass="toolbar-btn" OnClick="btnSearch_Click" UseSubmitBehavior="false">
+            <asp:LinkButton ID="btnSearch" runat="server" CssClass="toolbar-btn" OnClientClick="openSearchModal(); return false;" UseSubmitBehavior="false">
                 <span class="btn-icon-block bg-gray"></span>Search
             </asp:LinkButton>
             <asp:LinkButton ID="btnPrint" runat="server" CssClass="toolbar-btn" OnClientClick="window.print(); return false;" UseSubmitBehavior="false">
@@ -937,6 +1103,144 @@
                 <span class="btn-icon-block bg-red"></span>Exit
             </asp:LinkButton>
         </div>
+
+        <!-- Overlay for Search Modal -->
+        <div id="searchModalOverlay" class="modal-overlay" style="display:none;">
+            <div id="searchModalBox" class="modal-box">
+                <div class="modal-header">
+                    <span class="modal-title">Search Assets</span>
+                    <button type="button" class="modal-close-btn" onclick="closeSearchModal();">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-search-inputs">
+                        <input type="text" id="txtModalSearch" placeholder="Search by ID or Description..." class="modal-search-input" onkeyup="filterModalAssets();" />
+                        <button type="button" class="modal-search-btn" onclick="filterModalAssets();">Search</button>
+                    </div>
+                    <div class="modal-results-container">
+                        <table class="modal-results-table">
+                            <thead>
+                                <tr>
+                                    <th>Asset ID</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalResultsBody">
+                                <!-- Dynamically populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="divNoModalResults" class="modal-no-results" style="display:none;">
+                            No assets matched your search.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-footer-cancel-btn" onclick="closeSearchModal();">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden postback controls for loading selected asset -->
+        <asp:HiddenField ID="hdnSelectedAssetId" runat="server" />
+        <asp:Button ID="btnLoadAsset" runat="server" OnClick="btnLoadAsset_Click" Style="display:none;" UseSubmitBehavior="false" />
+
+        <script type="text/javascript">
+            function openSearchModal() {
+                var overlay = document.getElementById("searchModalOverlay");
+                overlay.style.display = "flex";
+                
+                // Clear input and focus
+                var searchInput = document.getElementById("txtModalSearch");
+                searchInput.value = "";
+                searchInput.focus();
+                
+                // Render all items initially
+                filterModalAssets();
+            }
+
+            function closeSearchModal() {
+                document.getElementById("searchModalOverlay").style.display = "none";
+            }
+
+            function filterModalAssets() {
+                var query = document.getElementById("txtModalSearch").value.toLowerCase().trim();
+                var tbody = document.getElementById("modalResultsBody");
+                var noResults = document.getElementById("divNoModalResults");
+                
+                tbody.innerHTML = "";
+                
+                var filtered = [];
+                if (typeof assetsJson !== 'undefined') {
+                    filtered = assetsJson;
+                }
+                
+                if (query !== "") {
+                    filtered = filtered.filter(function(a) {
+                        return a.AssetId.toLowerCase().includes(query) || 
+                               a.Description.toLowerCase().includes(query);
+                    });
+                }
+                
+                if (filtered.length === 0) {
+                    noResults.style.display = "block";
+                } else {
+                    noResults.style.display = "none";
+                    filtered.forEach(function(a) {
+                        var tr = document.createElement("tr");
+                        tr.className = "modal-row";
+                        
+                        tr.onclick = function() {
+                            selectModalAsset(a.AssetId);
+                        };
+                        
+                        var tdId = document.createElement("td");
+                        tdId.className = "modal-row-id";
+                        tdId.innerText = a.AssetId;
+                        
+                        var tdDesc = document.createElement("td");
+                        tdDesc.innerText = a.Description;
+                        
+                        var tdStatus = document.createElement("td");
+                        var span = document.createElement("span");
+                        span.className = "status-badge-small " + (a.Status === "Active" ? "badge-active" : "badge-disposed");
+                        span.innerText = a.Status;
+                        tdStatus.appendChild(span);
+                        
+                        tr.appendChild(tdId);
+                        tr.appendChild(tdDesc);
+                        tr.appendChild(tdStatus);
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+
+            function selectModalAsset(assetId) {
+                closeSearchModal();
+                document.getElementById("<%= hdnSelectedAssetId.ClientID %>").value = assetId;
+                document.getElementById("<%= btnLoadAsset.ClientID %>").click();
+            }
+
+            // Click-outside behavior:
+            // Clicks inside modal box stop propagation.
+            // Double-click on overlay closes the modal.
+            document.addEventListener("DOMContentLoaded", function() {
+                var overlay = document.getElementById("searchModalOverlay");
+                var modalBox = document.getElementById("searchModalBox");
+                
+                if (overlay && modalBox) {
+                    modalBox.addEventListener("click", function(e) {
+                        e.stopPropagation();
+                    });
+                    modalBox.addEventListener("dblclick", function(e) {
+                        e.stopPropagation();
+                    });
+                    
+                    overlay.addEventListener("dblclick", function(e) {
+                        closeSearchModal();
+                    });
+                }
+            });
+        </script>
 
         <!-- 7. Footer -->
         <footer class="footer">

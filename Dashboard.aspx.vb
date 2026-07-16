@@ -53,13 +53,109 @@ Partial Public Class DashboardPage
             ' Seed mock data to populate list
             initialList.Add(New AssetItem() With {
                 .AssetId = "0000000001",
+                .Description = "Bending Machine",
+                .Category = "Industrial Machinery",
+                .Brand = "Accurpress",
+                .ModelNo = "AP-76-23",
+                .SerialNo = "BND-88992",
+                .Section = "Heavy Machinery Dept",
+                .Location = "Machinery Hall A",
+                .Employee = "Prof. Richard Feynman",
+                .BudgetUtilizedFrom = "State Lab Grant FY24",
+                .Supplier = "Accurpress Tech",
+                .InvoiceNo = "INV-7762",
+                .ContractSchNo = "MNT-BND-01",
+                .OriginalCost = 15000.00D,
+                .CurrentValue = 12500.00D,
+                .AccDeprec = 2500.00D,
+                .FYOpeningBal = 15000.00D,
+                .FYClosingBal = 12500.00D,
+                .DepStartDate = "2024-03-01",
+                .FirstDeprFY = "2023-2024",
+                .LastDeprFY = "2028-2029",
+                .PurchaseDate = "2024-02-15",
+                .PurchaseFY = "2023-2024",
+                .WarrantyExp = "2027-02-15",
+                .DisposalDate = "",
+                .DisposalReason = "",
+                .Remarks = "Main bending unit, calibrated.",
+                .Status = "Active",
+                .EnterBy = "faham_admin",
+                .EntryDate = "2024-02-15"
+            })
+            initialList.Add(New AssetItem() With {
+                .AssetId = "0000000002",
+                .Description = "Lathe Machine",
+                .Category = "Industrial Machinery",
+                .Brand = "Mazak",
+                .ModelNo = "QuickTurn 250",
+                .SerialNo = "MZK-1122",
+                .Section = "Mechanical Engineering Lab",
+                .Location = "Room 104 Lab",
+                .Employee = "Dr. Robert Goddard",
+                .BudgetUtilizedFrom = "University CapEx Fund",
+                .Supplier = "Mazak USA",
+                .InvoiceNo = "INV-1109",
+                .ContractSchNo = "MNT-MZK-88",
+                .OriginalCost = 22000.00D,
+                .CurrentValue = 18000.00D,
+                .AccDeprec = 4000.00D,
+                .FYOpeningBal = 22000.00D,
+                .FYClosingBal = 18000.00D,
+                .DepStartDate = "2024-08-01",
+                .FirstDeprFY = "2024-2025",
+                .LastDeprFY = "2029-2030",
+                .PurchaseDate = "2024-07-10",
+                .PurchaseFY = "2024-2025",
+                .WarrantyExp = "2029-07-10",
+                .DisposalDate = "",
+                .DisposalReason = "",
+                .Remarks = "Precision lathe, high throughput.",
+                .Status = "Active",
+                .EnterBy = "faham_admin",
+                .EntryDate = "2024-07-10"
+            })
+            initialList.Add(New AssetItem() With {
+                .AssetId = "0000000003",
+                .Description = "Drilling Machine",
+                .Category = "Industrial Machinery",
+                .Brand = "HP Printer & Mach",
+                .ModelNo = "Drill-Pro 50",
+                .SerialNo = "DRL-449",
+                .Section = "Mechanical Engineering Lab",
+                .Location = "Room 104 Lab",
+                .Employee = "Office Pool",
+                .BudgetUtilizedFrom = "General Budget",
+                .Supplier = "Tool Depot",
+                .InvoiceNo = "INV-445566",
+                .ContractSchNo = "MNT-HP-882",
+                .OriginalCost = 8500.00D,
+                .CurrentValue = 0.00D,
+                .AccDeprec = 8500.00D,
+                .FYOpeningBal = 1500.00D,
+                .FYClosingBal = 0.00D,
+                .DepStartDate = "2021-02-01",
+                .FirstDeprFY = "2020-2021",
+                .LastDeprFY = "2024-2025",
+                .PurchaseDate = "2021-01-20",
+                .PurchaseFY = "2020-2021",
+                .WarrantyExp = "2024-01-20",
+                .DisposalDate = "2025-05-15",
+                .DisposalReason = "Accidental structural fracture",
+                .Remarks = "Written off after frame cracked.",
+                .Status = "Disposed",
+                .EnterBy = "system_op",
+                .EntryDate = "2021-01-20"
+            })
+            initialList.Add(New AssetItem() With {
+                .AssetId = "0000000004",
                 .Description = "Dell Latitude Laptop 5420",
                 .Category = "Computers & Electronics",
                 .Brand = "Dell",
                 .ModelNo = "L5420",
                 .SerialNo = "DELL-12345",
-                .Section = "Academic Support",
-                .Location = "IT Lab 1",
+                .Section = "IT Dept",
+                .Location = "IT Support Room",
                 .Employee = "Prof. John Doe",
                 .BudgetUtilizedFrom = "Department Grant FY25",
                 .Supplier = "Dell Premier Services",
@@ -84,13 +180,13 @@ Partial Public Class DashboardPage
                 .EntryDate = "2025-01-10"
             })
             initialList.Add(New AssetItem() With {
-                .AssetId = "0000000002",
+                .AssetId = "0000000005",
                 .Description = "Ergonomic Desk Chair",
                 .Category = "Office Furniture",
                 .Brand = "Steelcase",
                 .ModelNo = "Gesture",
                 .SerialNo = "SC-98765",
-                .Section = "Administration",
+                .Section = "Admin Dept",
                 .Location = "Office 302",
                 .Employee = "Sarah Connor",
                 .BudgetUtilizedFrom = "Admin Overhead Fund",
@@ -115,39 +211,15 @@ Partial Public Class DashboardPage
                 .EnterBy = "faham_admin",
                 .EntryDate = "2024-06-15"
             })
-            initialList.Add(New AssetItem() With {
-                .AssetId = "0000000003",
-                .Description = "HP LaserJet Printer Pro",
-                .Category = "Office Equipment",
-                .Brand = "HP",
-                .ModelNo = "M404dn",
-                .SerialNo = "CNB8M12345",
-                .Section = "Administration",
-                .Location = "Copy Room 1",
-                .Employee = "Office Pool",
-                .BudgetUtilizedFrom = "General Budget",
-                .Supplier = "Office Depot",
-                .InvoiceNo = "INV-445566",
-                .ContractSchNo = "MNT-HP-882",
-                .OriginalCost = 450.00D,
-                .CurrentValue = 0.00D,
-                .AccDeprec = 450.00D,
-                .FYOpeningBal = 150.00D,
-                .FYClosingBal = 0.00D,
-                .DepStartDate = "2021-02-01",
-                .FirstDeprFY = "2020-2021",
-                .LastDeprFY = "2024-2025",
-                .PurchaseDate = "2021-01-20",
-                .PurchaseFY = "2020-2021",
-                .WarrantyExp = "2024-01-20",
-                .DisposalDate = "2025-05-15",
-                .DisposalReason = "Accidental mechanical failure, unrepairable.",
-                .Remarks = "Fully written off and disposed.",
-                .Status = "Disposed",
-                .EnterBy = "system_op",
-                .EntryDate = "2021-01-20"
-            })
             Session("AssetList") = initialList
+        End If
+
+        ' Always register the latest assets list JSON for the client-side search modal
+        Dim assetsList As List(Of AssetItem) = CType(Session("AssetList"), List(Of AssetItem))
+        If assetsList IsNot Nothing Then
+            Dim json As String = GetAssetsJson(assetsList)
+            Dim script As String = "var assetsJson = " & json & ";"
+            ClientScript.RegisterStartupScript(Me.GetType(), "assetsJson", script, True)
         End If
 
         If Not IsPostBack Then
@@ -157,20 +229,16 @@ Partial Public Class DashboardPage
             lblSystemTitle.Text = "Asset Management System"
             lblCopyrightDepartment.Text = "Department of Information Technology"
 
-            ' TODO: Add change password redirection or modal logic here.
-            ' TODO: Wire submenu click events or page routing.
-
             ' 4. Populate user profile details
             Dim email As String = Session("CurrentUser").ToString()
             Dim userName As String = If(Session("CurrentUserName") IsNot Nothing, Session("CurrentUserName").ToString(), email.Split("@"c)(0))
             lblUserName.Text = userName
 
             ' 5. Load first asset or start in "New" mode if empty
-            Dim assets As List(Of AssetItem) = CType(Session("AssetList"), List(Of AssetItem))
-            If assets.Count > 0 Then
-                ViewState("SelectedAssetId") = assets(0).AssetId
+            If assetsList.Count > 0 Then
+                ViewState("SelectedAssetId") = assetsList(0).AssetId
                 ViewState("CurrentMode") = "View"
-                LoadAsset(assets(0).AssetId)
+                LoadAsset(assetsList(0).AssetId)
             Else
                 btnNew_Click(Nothing, Nothing)
             End If
@@ -547,4 +615,30 @@ Partial Public Class DashboardPage
     Protected Sub rptTasks_ItemCommand(source As Object, e As Global.System.Web.UI.WebControls.RepeaterCommandEventArgs)
         ' Legacy handler stub (no functional implementation needed)
     End Sub
+
+    Protected Sub btnLoadAsset_Click(sender As Object, e As EventArgs)
+        Dim assetId As String = hdnSelectedAssetId.Value.Trim()
+        If Not String.IsNullOrEmpty(assetId) Then
+            LoadAsset(assetId)
+        End If
+    End Sub
+
+    Private Function GetAssetsJson(assets As List(Of AssetItem)) As String
+        Dim sb As New System.Text.StringBuilder()
+        sb.Append("[")
+        For i As Integer = 0 To assets.Count - 1
+            Dim a = assets(i)
+            Dim desc As String = a.Description.Replace("\", "\\").Replace("""", "\""").Replace(vbCr, " ").Replace(vbLf, " ")
+            sb.Append("{")
+            sb.AppendFormat("""AssetId"":""{0}"",", a.AssetId)
+            sb.AppendFormat("""Description"":""{0}"",", desc)
+            sb.AppendFormat("""Status"":""{0}""", a.Status)
+            sb.Append("}")
+            If i < assets.Count - 1 Then
+                sb.Append(",")
+            End If
+        Next
+        sb.Append("]")
+        Return sb.ToString()
+    End Function
 End Class
