@@ -1184,7 +1184,7 @@
                             <tbody>
                                 <asp:Repeater ID="rptModalResults" runat="server" OnItemCommand="rptModalResults_ItemCommand">
                                     <ItemTemplate>
-                                        <tr class="modal-row" onclick="var link = document.getElementById('<%# CType(Container.FindControl("lnkSelectModalAsset"), LinkButton).ClientID %>'); if(link) link.click();">
+                                        <tr class="modal-row" ondblclick="var link = document.getElementById('<%# CType(Container.FindControl("lnkSelectModalAsset"), LinkButton).ClientID %>'); if(link) link.click();">
                                             <td class="modal-row-id">
                                                 <asp:LinkButton ID="lnkSelectModalAsset" runat="server" CommandName="Select" CommandArgument='<%# Eval("AssetId") %>' Text='<%# Eval("AssetId") %>' style="display:none;" />
                                                 <%# Eval("AssetId") %>
@@ -1211,13 +1211,9 @@
             </div>
         </div>
 
-        <!-- Hidden button for double-click closing postback -->
-        <asp:Button ID="btnCloseModal" runat="server" OnClick="btnCloseModal_Click" Style="display:none;" UseSubmitBehavior="false" />
-
         <script type="text/javascript">
             // Click-outside behavior:
             // Clicks/Double-clicks inside modal box stop propagation.
-            // Double-click on overlay closes the modal.
             document.addEventListener("DOMContentLoaded", function() {
                 var overlay = document.getElementById("searchModalOverlay");
                 var modalBox = document.getElementById("searchModalBox");
@@ -1228,11 +1224,6 @@
                     });
                     modalBox.addEventListener("dblclick", function(e) {
                         e.stopPropagation();
-                    });
-                    
-                    overlay.addEventListener("dblclick", function(e) {
-                        // Trigger server postback to close the modal and update state
-                        document.getElementById("<%= btnCloseModal.ClientID %>").click();
                     });
 
                     // Prevent viewport touch-dragging / background scroll on touch screens
