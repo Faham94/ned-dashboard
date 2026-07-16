@@ -12,7 +12,6 @@ End Class
 Partial Public Class DashboardPage
     Inherits System.Web.UI.Page
 
-
     Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
         ' 1. Check if user is authenticated
         If Session("CurrentUser") Is Nothing Then
@@ -25,26 +24,24 @@ Partial Public Class DashboardPage
         End If
 
         If Not IsPostBack Then
-            ' 3. Populate user profile details
+            ' 3. Populate university dashboard labels
+            ' These can be configured programmatically or loaded from a configuration/database source.
+            lblInstitutionName.Text = "National University of Engineering & Development"
+            lblDepartmentName.Text = "Department of Information Technology"
+            lblSystemTitle.Text = "Asset Management System"
+            lblCopyrightDepartment.Text = "Department of Information Technology"
+
+            ' TODO: Add change password redirection or modal logic here.
+            ' TODO: Wire submenu click events or page routing.
+            ' TODO: Load asset details or grid data from database data source instead of empty view.
+
+            ' 4. Populate user profile details
             Dim email As String = Session("CurrentUser").ToString()
             Dim userName As String = If(Session("CurrentUserName") IsNot Nothing, Session("CurrentUserName").ToString(), email.Split("@"c)(0))
             
             lblUserName.Text = userName
-            lblProfileName.Text = userName
-            
-            ' Avatar Initials (first letters of the name)
-            Dim initials As String = "U"
-            If userName.Length > 0 Then
-                Dim parts As String() = userName.Split(" "c)
-                If parts.Length > 1 Then
-                    initials = parts(0)(0).ToString() & parts(1)(0).ToString()
-                Else
-                    initials = userName.Substring(0, Math.Min(2, userName.Length))
-                End If
-            End If
-            lblAvatar.Text = initials.ToUpper()
 
-            ' 4. Bind initial state
+            ' 5. Bind initial state
             BindTaskList()
         End If
     End Sub

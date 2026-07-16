@@ -2,29 +2,46 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>Dashboard - VB.NET Web App</title>
+    <title>University Admin Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-gradient-start: #0b0f19;
-            --bg-gradient-end: #111827;
-            --card-bg: rgba(255, 255, 255, 0.04);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --sidebar-bg: rgba(17, 24, 39, 0.95);
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
-            --accent-primary: #6366f1;
-            --accent-hover: #4f46e5;
-            --input-bg: rgba(17, 24, 39, 0.6);
-            --input-border: rgba(255, 255, 255, 0.1);
-            --success-color: #10b981;
-            --success-bg: rgba(16, 185, 129, 0.1);
-            --warning-color: #f59e0b;
-            --warning-bg: rgba(245, 158, 11, 0.1);
-            --error-color: #ef4444;
-            --error-bg: rgba(239, 68, 68, 0.1);
+            /* Light theme university-style custom properties */
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            
+            --maroon: #800000;
+            --green: #1b5e20;
+            --navy: #0d47a1;
+            --orange-accent: #f57c00;
+            --orange-light: #fff8e1;
+            
+            --header-bg: #ffffff;
+            --info-bar-bg: #e2e8f0;
+            --menu-bar-bg: #e65c00;
+            --title-bar-bg: #e0f2fe;
+            
+            --data-entry-header: #1e3a8a;
+            --data-view-header: #064e3b;
+            
+            --cream-bg: #fffdf0;
+            --orange-border: #f97316;
+            
+            --accent-primary: #0288d1;
+            --accent-hover: #01579b;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --success-color: #1b5e20;
+            --success-bg: rgba(27, 94, 32, 0.1);
+            --warning-color: #e65c00;
+            --warning-bg: rgba(230, 92, 0, 0.1);
+            --error-color: #b91c1c;
+            --error-bg: rgba(185, 28, 28, 0.1);
         }
 
         * {
@@ -34,354 +51,468 @@
         }
 
         body {
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: radial-gradient(circle at top right, #1e1b4b 0%, var(--bg-gradient-start) 60%), var(--bg-gradient-end);
+            font-family: 'Inter', 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             min-height: 100vh;
-            color: var(--text-primary);
-            display: flex;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--card-border);
             display: flex;
             flex-direction: column;
-            padding: 30px 20px;
-            position: fixed;
-            height: 100vh;
-            z-index: 100;
         }
 
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 40px;
-            padding-left: 8px;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #818cf8, #c084fc);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            font-size: 1.1rem;
-        }
-
-        .logo-text {
-            font-weight: 700;
-            font-size: 1.25rem;
-            background: linear-gradient(to right, #a5b4fc, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .nav-item a, .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.2s ease;
-            font-weight: 500;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-
-        .nav-item.active a, .nav-item a:hover {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-item.active a {
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-            border: 1px solid rgba(99, 102, 241, 0.2);
-        }
-
-        .sidebar-footer {
-            margin-top: auto;
-        }
-
-        .logout-btn {
-            color: #f87171;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            text-align: left;
-            font-family: inherit;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logout-btn:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
-
-        /* Main Content Styling */
-        .main-content {
-            margin-left: 260px;
-            flex: 1;
-            padding: 40px;
-            max-width: 1200px;
-        }
-
-        /* Header area */
-        .header {
+        /* 1. Top Header Bar */
+        .top-header {
+            background-color: var(--header-bg);
+            border-bottom: 2px solid var(--maroon);
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .welcome-title h2 {
-            font-size: 1.75rem;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .univ-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid var(--maroon);
+            object-fit: cover;
+        }
+
+        .title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-title {
+            font-size: 1.3rem;
             font-weight: 700;
+            color: var(--maroon);
+            line-height: 1.2;
+        }
+
+        .sub-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--green);
+            margin-top: 2px;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .system-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--navy);
             letter-spacing: -0.5px;
         }
 
-        .welcome-title p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-top: 4px;
-        }
-
-        .user-profile {
+        /* 2. Sub-Header Info Bar */
+        .info-bar {
+            background-color: var(--info-bar-bg);
+            padding: 8px 24px;
             display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 8px 16px;
-            border-radius: 50px;
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-            font-size: 0.9rem;
-        }
-
-        .user-info {
-            text-align: left;
-        }
-
-        .user-name {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .user-role {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        /* Grid Statistics Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 24px;
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .stat-info h3 {
+            align-items: center;
             font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
+            border-bottom: 1px solid var(--card-border);
         }
 
-        .stat-info p {
-            font-size: 2rem;
-            font-weight: 700;
+        .user-welcome {
+            font-weight: 500;
+            color: var(--text-primary);
         }
 
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+        .user-welcome strong {
+            color: var(--navy);
+        }
+
+        .info-actions {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
+            gap: 16px;
         }
 
-        .stat-icon.total {
-            background: rgba(99, 102, 241, 0.15);
-            color: #818cf8;
+        .info-actions a, .info-actions .action-link {
+            color: var(--navy);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            font-family: inherit;
         }
 
-        .stat-icon.completed {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
+        .info-actions a:hover, .info-actions .action-link:hover {
+            color: var(--maroon);
+            text-decoration: underline;
         }
 
-        .stat-icon.efficiency {
-            background: rgba(168, 85, 247, 0.15);
-            color: #c084fc;
+        .divider {
+            color: var(--text-secondary);
         }
 
-        /* Split columns */
-        .content-split {
+        /* 3. Orange Menu Bar */
+        .menu-bar {
+            background-color: var(--menu-bar-bg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 50;
+        }
+
+        .menu-list {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0 16px;
+        }
+
+        .menu-item {
+            position: relative;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .menu-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .arrow-down {
+            font-size: 0.75rem;
+        }
+
+        /* Dropdown menus on hover */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            border: 1px solid var(--card-border);
+            list-style: none;
+            padding: 6px 0;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .menu-item:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-item a {
+            display: block;
+            padding: 10px 16px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .dropdown-item a:hover {
+            background-color: var(--orange-light);
+            color: var(--orange-accent);
+        }
+
+        /* 4. Page Title Bar */
+        .page-title-bar {
+            background-color: var(--title-bar-bg);
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .page-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main container layout */
+        .main-container {
+            flex: 1;
+            padding: 24px;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* 5. Split Panels */
+        .panels-grid {
             display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 30px;
-            align-items: start;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
         }
 
-        @media (max-width: 900px) {
-            .content-split {
+        @media (max-width: 992px) {
+            .panels-grid {
                 grid-template-columns: 1fr;
             }
         }
 
         .card {
-            background: var(--card-bg);
+            background-color: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .card h3 {
-            font-size: 1.25rem;
+        .card-header {
+            padding: 12px 18px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header.data-entry {
+            background-color: var(--data-entry-header);
+        }
+
+        .card-header.data-view {
+            background-color: var(--data-view-header);
+        }
+
+        .card-body {
+            padding: 20px;
+            flex: 1;
+        }
+
+        /* 2-Column Grid Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 16px 12px;
+            align-items: center;
+        }
+
+        .form-label {
             font-weight: 600;
-            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .form-input-container {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-control {
+        .form-input-readonly {
             width: 100%;
-            padding: 12px 16px;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 12px;
-            outline: none;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .form-control:focus {
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 0.95rem;
+            max-width: 120px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
             font-weight: 600;
+            color: var(--text-primary);
+            background-color: var(--cream-bg);
+            border: 1px solid var(--orange-border);
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .form-input-entry {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background-color: var(--cream-bg);
+            border: 1px solid var(--orange-border);
+            border-radius: 4px;
+            outline: none;
+            transition: box-shadow 0.2s;
+        }
+
+        .form-input-entry:focus {
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25);
+        }
+
+        .btn-create {
+            grid-column: 2;
+            justify-self: start;
+            background-color: var(--navy);
             color: white;
-            background: var(--accent-primary);
             border: none;
-            border-radius: 12px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-            font-family: inherit;
+            transition: background-color 0.2s;
         }
 
-        .btn:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
+        .btn-create:hover {
+            background-color: #0b3c8f;
         }
 
-        /* Task List Styling */
+        /* Status Badge */
+        .status-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--success-bg);
+            border: 1px solid var(--success-color);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-text {
+            color: var(--success-color);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Data View empty placeholder */
+        .empty-placeholder {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            min-height: 180px;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        /* 6. Bottom Action Bar (Toolbar) */
+        .action-toolbar {
+            background-color: #0f172a; /* Dark blue/slate strip */
+            padding: 10px 16px;
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .toolbar-btn {
+            background-color: #334155;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .toolbar-btn:hover {
+            background-color: #475569;
+        }
+
+        .toolbar-btn:active {
+            transform: scale(0.97);
+        }
+
+        .toolbar-btn.btn-exit {
+            background-color: var(--maroon);
+            margin-left: auto;
+        }
+
+        .toolbar-btn.btn-exit:hover {
+            background-color: #991b1b;
+        }
+
+        /* Task List Management container */
+        .tasks-section {
+            margin-top: 12px;
+        }
+
+        .tasks-card-header {
+            background-color: #475569;
+            color: white;
+            padding: 12px 18px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 8px 8px 0 0;
+        }
+
         .task-list {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .task-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--card-border);
-            padding: 14px 20px;
-            border-radius: 14px;
-            transition: all 0.2s ease;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px 18px;
+            border-radius: 6px;
+            transition: background-color 0.2s, border-color 0.2s;
         }
 
         .task-item:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.12);
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
         }
 
         .task-item.completed {
-            border-color: rgba(16, 185, 129, 0.2);
-            background: rgba(16, 185, 129, 0.02);
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
         }
 
         .task-item.completed .task-text {
             text-decoration: line-through;
-            color: var(--text-secondary);
+            color: #94a3b8;
         }
 
         .task-text {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 500;
         }
 
@@ -392,133 +523,206 @@
 
         .action-btn {
             padding: 6px 12px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: 4px;
             text-decoration: none;
-            transition: all 0.2s ease;
             cursor: pointer;
             border: none;
             font-family: inherit;
+            transition: background-color 0.2s;
         }
 
         .toggle-btn {
-            background: var(--accent-primary);
+            background-color: var(--accent-primary);
             color: white;
         }
 
         .toggle-btn:hover {
-            background: var(--accent-hover);
+            background-color: var(--accent-hover);
         }
 
         .task-item.completed .toggle-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background-color: #e2e8f0;
             color: var(--text-primary);
         }
 
         .task-item.completed .toggle-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background-color: #cbd5e1;
         }
 
         .delete-btn {
-            background: rgba(239, 68, 68, 0.1);
-            color: #f87171;
+            background-color: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
         }
 
         .delete-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+            background-color: rgba(220, 38, 38, 0.2);
         }
 
         .empty-tasks {
             text-align: center;
             color: var(--text-secondary);
-            font-size: 0.95rem;
-            padding: 40px 0;
+            font-size: 0.9rem;
+            padding: 30px 0;
             font-style: italic;
+        }
+
+        /* 7. Footer */
+        .footer {
+            background-color: #ffffff;
+            border-top: 1px solid var(--card-border);
+            padding: 14px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: auto;
         }
     </style>
 </head>
 <body>
     <form id="form1" runat="server">
-        <!-- Sidebar Navigation -->
-        <div class="sidebar">
-            <div class="logo-section">
-                <div class="logo-icon">🎛️</div>
-                <div class="logo-text">NedApp</div>
+        <!-- 1. Top Header Bar -->
+        <header class="top-header">
+            <div class="header-left">
+                <!-- Circular logo placeholder -->
+                <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=150&auto=format&fit=crop" alt="University Logo" class="univ-logo" />
+                <div class="title-group">
+                    <span class="main-title">
+                        <asp:Label ID="lblInstitutionName" runat="server">National University of Engineering & Development</asp:Label>
+                    </span>
+                    <span class="sub-title">
+                        <asp:Label ID="lblDepartmentName" runat="server">Department of Information Technology</asp:Label>
+                    </span>
+                </div>
             </div>
-            
-            <ul class="nav-list">
-                <li class="nav-item active"><a href="#">Overview</a></li>
-                <li class="nav-item"><a href="#" onclick="alert('Analytics feature is disabled in demo mode.'); return false;">Analytics</a></li>
-                <li class="nav-item"><a href="#" onclick="alert('Settings feature is disabled in demo mode.'); return false;">Settings</a></li>
-            </ul>
+            <div class="header-right">
+                <span class="system-title">
+                    <asp:Label ID="lblSystemTitle" runat="server">Asset Management System</asp:Label>
+                </span>
+            </div>
+        </header>
 
-            <div class="sidebar-footer">
-                <asp:Button ID="btnLogout" runat="server" Text="Log Out" CssClass="logout-btn" OnClick="btnLogout_Click" UseSubmitBehavior="false" />
+        <!-- 2. Sub-Header Info Bar -->
+        <div class="info-bar">
+            <div class="user-welcome">
+                Login User : <strong><asp:Label ID="lblUserName" runat="server"></asp:Label></strong>
+            </div>
+            <div class="info-actions">
+                <!-- TODO: Change Password page / popup placeholder link -->
+                <a href="#" onclick="alert('Change Password feature is not implemented yet. (TODO)'); return false;">Change Password</a>
+                <span class="divider">|</span>
+                <asp:LinkButton ID="btnLogout" runat="server" CssClass="action-link" OnClick="btnLogout_Click" UseSubmitBehavior="false" Text="Logout" />
             </div>
         </div>
 
-        <!-- Main Workspace -->
-        <div class="main-content">
-            <!-- Header section -->
-            <div class="header">
-                <div class="welcome-title">
-                    <h2>Hello, <asp:Label ID="lblUserName" runat="server"></asp:Label>!</h2>
-                    <p>Welcome to your personal workspace. Here is your overview.</p>
+        <!-- 3. Orange Horizontal Menu Bar -->
+        <nav class="menu-bar">
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="#" class="menu-link" onclick="return false;">
+                        Master Information <span class="arrow-down">▼</span>
+                    </a>
+                    <!-- TODO: Submenu actions placeholder -->
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="#" onclick="alert('Asset Master configuration is under development.'); return false;">Asset Master</a></li>
+                        <li class="dropdown-item"><a href="#" onclick="alert('Location Master configuration is under development.'); return false;">Location Master</a></li>
+                        <li class="dropdown-item"><a href="#" onclick="alert('Vendor Master configuration is under development.'); return false;">Vendor Master</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" onclick="return false;">
+                        Transactions <span class="arrow-down">▼</span>
+                    </a>
+                    <!-- TODO: Submenu actions placeholder -->
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="#" onclick="alert('Asset Allocation screen is under development.'); return false;">Asset Allocation</a></li>
+                        <li class="dropdown-item"><a href="#" onclick="alert('Asset Recovery screen is under development.'); return false;">Asset Recovery</a></li>
+                        <li class="dropdown-item"><a href="#" onclick="alert('Maintenance Request screen is under development.'); return false;">Maintenance Request</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" onclick="return false;">
+                        Reports <span class="arrow-down">▼</span>
+                    </a>
+                    <!-- TODO: Submenu actions placeholder -->
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="#" onclick="alert('Inventory Reports list is under development.'); return false;">Inventory Report</a></li>
+                        <li class="dropdown-item"><a href="#" onclick="alert('Maintenance History report is under development.'); return false;">Maintenance Log</a></li>
+                        <li class="dropdown-item"><a href="#" onclick="alert('Depreciation Report is under development.'); return false;">Depreciation Log</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 4. Page Title Bar -->
+        <div class="page-title-bar">
+            <span class="page-title">Dashboard Overview</span>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="main-container">
+            <!-- 5. Split Panels -->
+            <div class="panels-grid">
+                <!-- Left Panel: Data Entry -->
+                <div class="card">
+                    <div class="card-header data-entry">
+                        Data Entry
+                        <!-- Small green bold status badge placeholder -->
+                        <div class="status-box">
+                            <span class="status-indicator"></span>
+                            <span class="status-text">Active</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <!-- Readonly display of stats metrics -->
+                            <label class="form-label">Total Tasks:</label>
+                            <div class="form-input-container">
+                                <asp:TextBox ID="lblTotalTasks" runat="server" ReadOnly="true" CssClass="form-input-readonly">0</asp:TextBox>
+                            </div>
+
+                            <label class="form-label">Completed Tasks:</label>
+                            <div class="form-input-container">
+                                <asp:TextBox ID="lblCompletedTasks" runat="server" ReadOnly="true" CssClass="form-input-readonly">0</asp:TextBox>
+                            </div>
+
+                            <label class="form-label">Efficiency Metric:</label>
+                            <div class="form-input-container">
+                                <asp:TextBox ID="lblEfficiency" runat="server" ReadOnly="true" CssClass="form-input-readonly">0%</asp:TextBox>
+                            </div>
+
+                            <!-- Interactive Task Entry Row -->
+                            <label class="form-label">New Task Name:</label>
+                            <div class="form-input-container">
+                                <asp:TextBox ID="txtTaskName" runat="server" CssClass="form-input-entry" placeholder="e.g., Verify science lab equipment assets" AutoCompleteType="Disabled"></asp:TextBox>
+                            </div>
+
+                            <asp:Button ID="btnAddTask" runat="server" Text="Create Task Entry" CssClass="btn-create" OnClick="btnAddTask_Click" />
+                        </div>
+                    </div>
                 </div>
 
-                <div class="user-profile">
-                    <div class="avatar">
-                        <asp:Label ID="lblAvatar" runat="server"></asp:Label>
+                <!-- Right Panel: Data View -->
+                <div class="card">
+                    <div class="card-header data-view">
+                        Data View
                     </div>
-                    <div class="user-info">
-                        <div class="user-name"><asp:Label ID="lblProfileName" runat="server"></asp:Label></div>
-                        <div class="user-role">Member Account</div>
+                    <div class="card-body">
+                        <!-- Empty placeholder content for data view -->
+                        <div class="empty-placeholder">
+                            No data selected
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Stats Grid row -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <h3>Total Tasks</h3>
-                        <p><asp:Label ID="lblTotalTasks" runat="server">0</asp:Label></p>
-                    </div>
-                    <div class="stat-icon total">📋</div>
+            <!-- Current Tasks list (Visible below split panels for interactive testing) -->
+            <div class="card tasks-section">
+                <div class="tasks-card-header">
+                    Current Task Items
                 </div>
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <h3>Completed</h3>
-                        <p><asp:Label ID="lblCompletedTasks" runat="server">0</asp:Label></p>
-                    </div>
-                    <div class="stat-icon completed">✅</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <h3>Efficiency</h3>
-                        <p><asp:Label ID="lblEfficiency" runat="server">0%</asp:Label></p>
-                    </div>
-                    <div class="stat-icon efficiency">⚡</div>
-                </div>
-            </div>
-
-            <!-- Action panels Split -->
-            <div class="content-split">
-                <!-- Column 1: Add task form -->
-                <div class="card">
-                    <h3>Add Task</h3>
-                    <div class="form-group">
-                        <asp:TextBox ID="txtTaskName" runat="server" CssClass="form-control" placeholder="e.g. Design homepage layout" AutoCompleteType="Disabled"></asp:TextBox>
-                    </div>
-                    <asp:Button ID="btnAddTask" runat="server" Text="Create Task" CssClass="btn" OnClick="btnAddTask_Click" />
-                </div>
-
-                <!-- Column 2: Tasks list view -->
-                <div class="card">
-                    <h3>Current Tasks</h3>
-                    
+                <div class="card-body">
                     <asp:Repeater ID="rptTasks" runat="server" OnItemCommand="rptTasks_ItemCommand">
                         <HeaderTemplate>
                             <ul class="task-list">
@@ -538,11 +742,30 @@
                     </asp:Repeater>
                     
                     <asp:Panel ID="pnlNoTasks" runat="server" Visible="true" CssClass="empty-tasks">
-                        No tasks in progress. Create your first task to get started!
+                        No tasks in progress. Create your first task entry above to get started!
                     </asp:Panel>
                 </div>
             </div>
-        </div>
+
+            <!-- 6. Bottom Action Bar (Toolbar) -->
+            <div class="action-toolbar">
+                <button type="button" class="toolbar-btn" onclick="alert('New item action triggered (TODO)');">➕ New</button>
+                <button type="button" class="toolbar-btn" onclick="alert('Edit action triggered (TODO)');">📝 Edit</button>
+                <button type="button" class="toolbar-btn" onclick="alert('Delete action triggered (TODO)');">❌ Delete</button>
+                <button type="button" class="toolbar-btn" onclick="alert('Save action triggered (TODO)');">💾 Save</button>
+                <button type="button" class="toolbar-btn" onclick="alert('Cancel action triggered (TODO)');">🚫 Cancel</button>
+                <button type="button" class="toolbar-btn" onclick="alert('Search action triggered (TODO)');">🔍 Search</button>
+                <button type="button" class="toolbar-btn" onclick="alert('Print report action triggered (TODO)');">🖨️ Print</button>
+                
+                <!-- Exit button wires to Logout (clears session and redirects) -->
+                <asp:LinkButton ID="btnExit" runat="server" CssClass="toolbar-btn btn-exit" OnClick="btnLogout_Click" UseSubmitBehavior="false">🚪 Exit</asp:LinkButton>
+            </div>
+        </main>
+
+        <!-- 7. Footer -->
+        <footer class="footer">
+            Copyright &copy; <asp:Label ID="lblCopyrightDepartment" runat="server"></asp:Label>
+        </footer>
     </form>
 </body>
 </html>
