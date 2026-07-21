@@ -8,18 +8,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-gradient-start: #0f172a;
-            --bg-gradient-end: #1e1b4b;
-            --card-bg: rgba(255, 255, 255, 0.08);
-            --card-border: rgba(255, 255, 255, 0.12);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --bg-gradient-start: #ffffff;
+            --bg-gradient-end: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
             --accent-primary: #6366f1;
             --accent-hover: #4f46e5;
-            --input-bg: rgba(15, 23, 42, 0.6);
-            --input-border: rgba(255, 255, 255, 0.15);
-            --error-color: #ef4444;
-            --success-color: #34d399;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            --error-color: #dc2626;
+            --success-color: #16a34a;
         }
 
         * {
@@ -30,7 +30,7 @@
 
         body {
             font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            background: #ffffff;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -41,21 +41,19 @@
 
         .container {
             background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 24px;
             padding: 40px;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .container:hover {
             transform: translateY(-5px);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
         }
 
         h1 {
@@ -105,8 +103,8 @@
 
         .form-control:focus {
             border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            background: #ffffff;
         }
 
         .btn {
@@ -173,19 +171,19 @@
     </style>
 </head>
 <body>
-    <form id="form1" runat="server">
+    <form id="form1" runat="server" autocomplete="off">
         <div class="container">
-            <h1>Welcome Back</h1>
-            <p class="subtitle">Sign in to access your dashboard</p>
+            <h1>Antigravity IDE</h1>
+            <p class="subtitle">Sign in to your account</p>
             
             <div class="form-group">
                 <label for="<%= txtEmail.ClientID %>" class="form-label">Email Address</label>
-                <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" placeholder="admin@example.com" AutoCompleteType="Disabled"></asp:TextBox>
+                <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" AutoCompleteType="Disabled" autocomplete="off" autofocus="autofocus"></asp:TextBox>
             </div>
 
             <div class="form-group">
                 <label for="<%= txtPassword.ClientID %>" class="form-label">Password</label>
-                <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" CssClass="form-control" placeholder="••••••••"></asp:TextBox>
+                <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" CssClass="form-control" autocomplete="off"></asp:TextBox>
             </div>
             
             <asp:Button ID="btnSubmit" runat="server" Text="Sign In" CssClass="btn" OnClick="btnSubmit_Click" />
@@ -197,5 +195,40 @@
             </p>
         </div>
     </form>
+    <script>
+        (function () {
+            var emailBox    = document.getElementById('<%= txtEmail.ClientID %>');
+            var passwordBox = document.getElementById('<%= txtPassword.ClientID %>');
+            var submitBtn   = document.getElementById('<%= btnSubmit.ClientID %>');
+
+            // ── 1. Enter on the email / username field ──────────────────────
+            // If password is still empty  → move focus to password field.
+            // If password already has a value → let Enter submit normally
+            //   (falls through to the browser's default form-submit behaviour).
+            if (emailBox && passwordBox) {
+                emailBox.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        if (passwordBox.value === '') {
+                            e.preventDefault();
+                            passwordBox.focus();
+                        }
+                        // password already filled: default submit fires naturally
+                    }
+                });
+            }
+
+            // ── 2. Enter on the password field ─────────────────────────────
+            // Explicitly click the Sign In button so the ASP.NET __doPostBack
+            // wired to btnSubmit_Click is triggered — identical to a mouse click.
+            if (passwordBox && submitBtn) {
+                passwordBox.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        e.preventDefault();
+                        submitBtn.click();
+                    }
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

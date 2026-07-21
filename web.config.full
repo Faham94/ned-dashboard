@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Oracle.ManagedDataAccess — register the ADO.NET provider
+       ═══════════════════════════════════════════════════════════ -->
+  <configSections>
+    <section name="oracle.manageddataaccess.client"
+             type="OracleInternal.Common.ODPMSectionHandler, Oracle.ManagedDataAccess, Version=4.122.23.1, Culture=neutral, PublicKeyToken=89b483f429c47342" />
+  </configSections>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Connection Strings
+       PASSWORD PLACEHOLDER: replace REPLACE_WITH_ACTUAL_PASSWORD
+       in the OracleDbConnection entry below before running.
+       ═══════════════════════════════════════════════════════════ -->
+  <connectionStrings>
+    <add name="OracleDbConnection"
+         connectionString="Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=YOUR_DB_HOST)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=YOUR_SERVICE_NAME)));User Id=YOUR_DB_USER;Password=YOUR_DB_PASSWORD;"
+         providerName="Oracle.ManagedDataAccess.Client" />
+  </connectionStrings>
+
+  <system.web>
+    <!-- Enable debugging for easier development -->
+    <compilation debug="true" targetFramework="4.0">
+      <assemblies>
+        <!-- Make Oracle assembly available to inline-compiled ASPX pages -->
+        <add assembly="Oracle.ManagedDataAccess, Version=4.122.23.1, Culture=neutral, PublicKeyToken=89b483f429c47342" />
+      </assemblies>
+    </compilation>
+    <!-- Target runtime configuration -->
+    <httpRuntime targetFramework="4.0" />
+  </system.web>
+
+</configuration>

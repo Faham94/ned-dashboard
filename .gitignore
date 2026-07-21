@@ -1,6 +1,6 @@
 # Compiled binaries
-Server.exe
-ServerLib.dll
+*.exe
+*.dll
 
 # Build output directories
 bin/

@@ -1,6 +1,49 @@
 Imports System
 Imports System.Collections.Generic
 Imports System.Linq
+Imports Oracle.ManagedDataAccess.Client
+
+<Serializable>
+Public Class CategoryItem
+    Public Property CategoryId As String
+    Public Property CategoryName As String
+End Class
+
+<Serializable>
+Public Class BrandItem
+    Public Property BrandId As String
+    Public Property BrandName As String
+End Class
+
+<Serializable>
+Public Class SectionItem
+    Public Property SectionId As String
+    Public Property SectionName As String
+End Class
+
+<Serializable>
+Public Class BudgetItem
+    Public Property BudgetAccountId As String
+    Public Property BudgetAccountName As String
+End Class
+
+<Serializable>
+Public Class SupplierItem
+    Public Property SupplierId As String
+    Public Property SupplierName As String
+End Class
+
+<Serializable>
+Public Class FinancialYearItem
+    Public Property FyId As String
+    Public Property FyLabel As String
+End Class
+
+<Serializable>
+Public Class DisposalReasonItem
+    Public Property DisposalReasonId As String
+    Public Property DisposalReasonName As String
+End Class
 
 <Serializable>
 Public Class AssetItem
@@ -446,12 +489,29 @@ Partial Public Class DashboardPage
         Dim assetId As String = txtAssetId.Text.Trim()
         Dim description As String = txtDescription.Text.Trim()
         Dim category As String = txtCategory.Text.Trim()
+        Dim brand As String = txtBrand.Text.Trim()
+        Dim section As String = txtSection.Text.Trim()
+        Dim budget As String = txtBudgetUtilizedFrom.Text.Trim()
+        Dim supplier As String = txtSupplier.Text.Trim()
 
-        ' Validation of required fields
-        If String.IsNullOrEmpty(assetId) OrElse String.IsNullOrEmpty(description) OrElse String.IsNullOrEmpty(category) Then
-            ClientScript.RegisterStartupScript(Me.GetType(), "alert", "alert('Validation Failure: Asset ID, Description, and Category are required fields!');", True)
+        ' Validation of 5 required fields: Category, Brand, Section, Budget Utilized From, Supplier
+        Dim missingList As New List(Of String)()
+        If String.IsNullOrEmpty(category) Then missingList.Add("Asset Category")
+        If String.IsNullOrEmpty(brand) Then missingList.Add("Brand")
+        If String.IsNullOrEmpty(section) Then missingList.Add("Section")
+        If String.IsNullOrEmpty(budget) Then missingList.Add("Budget Utilized From")
+        If String.IsNullOrEmpty(supplier) Then missingList.Add("Supplier")
+
+        If missingList.Count > 0 Then
+            lblFormMessage.Text = "Please fill " & String.Join(", ", missingList) & "."
+            lblFormMessage.CssClass = "msg-label error-msg"
+            lblFormMessage.Style("display") = "block"
+            lblFormMessage.Visible = True
             Exit Sub
         End If
+
+        lblFormMessage.Text = String.Empty
+        lblFormMessage.Style("display") = "none"
 
         Dim assets As List(Of AssetItem) = CType(Session("AssetList"), List(Of AssetItem))
         Dim asset As AssetItem = Nothing
@@ -581,20 +641,23 @@ Partial Public Class DashboardPage
 
     Private Sub BindAssetList()
         Dim assets As List(Of AssetItem) = CType(Session("AssetList"), List(Of AssetItem))
+        If assets Is Nothing Then assets = New List(Of AssetItem)()
         Dim search As String = txtSearchQuery.Text.Trim().ToLower()
 
+        Dim query = assets.AsEnumerable()
         If Not String.IsNullOrEmpty(search) Then
-            Dim filtered = assets.Where(Function(a) a.AssetId.ToLower().Contains(search) OrElse a.Description.ToLower().Contains(search)).ToList()
-            rptAssets.DataSource = filtered
-            pnlNoAssets.Visible = (filtered.Count = 0)
-        Else
-            rptAssets.DataSource = assets
-            pnlNoAssets.Visible = (assets.Count = 0)
+            query = query.Where(Function(a) a.AssetId.ToLower().Contains(search) OrElse a.Description.ToLower().Contains(search))
         End If
+
+        Dim filteredList = query.OrderBy(Function(a) a.AssetId).ToList()
+        rptAssets.DataSource = filteredList
+        pnlNoAssets.Visible = (filteredList.Count = 0)
         rptAssets.DataBind()
     End Sub
 
     Private Sub PopulateForm(asset As AssetItem)
+        lblFormMessage.Text = String.Empty
+        lblFormMessage.Style("display") = "none"
         txtAssetId.Text = asset.AssetId
         txtDescription.Text = asset.Description
         txtCategory.Text = asset.Category
@@ -638,6 +701,8 @@ Partial Public Class DashboardPage
     End Sub
 
     Private Sub ClearForm()
+        lblFormMessage.Text = String.Empty
+        lblFormMessage.Style("display") = "none"
         txtAssetId.Text = String.Empty
         txtDescription.Text = String.Empty
         txtCategory.Text = String.Empty
@@ -741,7 +806,21 @@ Partial Public Class DashboardPage
         End Set
     End Property
 
+    Private Sub CloseAllLookupModals()
+        IsSearchModalOpen = False
+        IsCategoryLookupOpen = False
+        IsBrandLookupOpen = False
+        IsSectionLookupOpen = False
+        IsBudgetLookupOpen = False
+        IsSupplierLookupOpen = False
+        IsPurchaseFYLookupOpen = False
+        IsFirstDeprFYLookupOpen = False
+        IsLastDeprFYLookupOpen = False
+        IsDisposalReasonLookupOpen = False
+    End Sub
+
     Protected Sub btnSearchOpen_Click(sender As Object, e As EventArgs)
+        CloseAllLookupModals()
         txtModalAssetId.Text = String.Empty
         txtModalPurchaseDate.Text = String.Empty
         txtModalBrand.Text = String.Empty
@@ -816,11 +895,803 @@ Partial Public Class DashboardPage
             End If
         End If
 
-        Dim resultList = filtered.ToList()
+        Dim resultList = filtered.OrderBy(Function(a) a.AssetId).ToList()
         rptModalResults.DataSource = resultList
         rptModalResults.DataBind()
 
         pnlNoModalResults.Visible = (resultList.Count = 0)
+    End Sub
+
+    ' ── Category Lookup Modal Logic ─────────────────────────────────────
+    Public Property IsCategoryLookupOpen As Boolean
+        Get
+            If ViewState("IsCategoryLookupOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsCategoryLookupOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsCategoryLookupOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnOpenCategoryLookup_Click(sender As Object, e As EventArgs)
+        If txtCategory.ReadOnly Then Exit Sub
+        CloseAllLookupModals()
+        txtCategorySearch.Text = String.Empty
+        BindCategoryLookupList(String.Empty)
+        IsCategoryLookupOpen = True
+    End Sub
+
+    Protected Sub btnCategorySearch_Click(sender As Object, e As EventArgs)
+        Dim prefix As String = txtCategorySearch.Text.Trim()
+        If String.IsNullOrEmpty(prefix) AndAlso Request.Form(txtCategorySearch.UniqueID) IsNot Nothing Then
+            prefix = Request.Form(txtCategorySearch.UniqueID).Trim()
+        End If
+        txtCategorySearch.Text = prefix
+        BindCategoryLookupList(prefix)
+        IsCategoryLookupOpen = True
+    End Sub
+
+    Protected Sub btnCloseCategoryLookup_Click(sender As Object, e As EventArgs)
+        IsCategoryLookupOpen = False
+    End Sub
+
+    Protected Sub rptCategoryResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim selectedCategory As String = e.CommandArgument.ToString()
+            txtCategory.Text = selectedCategory
+            IsCategoryLookupOpen = False
+        End If
+    End Sub
+
+    Private Sub BindCategoryLookupList(prefix As String)
+        lblCategoryError.Visible = False
+        pnlNoCategoryResults.Visible = False
+        Dim list As New List(Of CategoryItem)()
+
+        Try
+            Using conn As OracleConnection = DbHelper.GetConnection()
+                Dim sql As String
+                If String.IsNullOrEmpty(prefix) Then
+                    sql = "SELECT CATEGORY_ID, CATEGORY FROM M_CATEGORY ORDER BY CATEGORY_ID ASC"
+                Else
+                    sql = "SELECT CATEGORY_ID, CATEGORY FROM M_CATEGORY WHERE UPPER(CATEGORY) LIKE UPPER(:prefix) ORDER BY CATEGORY_ID ASC"
+                End If
+
+                Using cmd As New OracleCommand(sql, conn)
+                    cmd.BindByName = True
+                    If Not String.IsNullOrEmpty(prefix) Then
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                    End If
+
+                    Using reader As OracleDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            list.Add(New CategoryItem() With {
+                                .CategoryId = If(reader("CATEGORY_ID") IsNot DBNull.Value, reader("CATEGORY_ID").ToString(), ""),
+                                .CategoryName = If(reader("CATEGORY") IsNot DBNull.Value, reader("CATEGORY").ToString(), "")
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            rptCategoryResults.DataSource = list
+            rptCategoryResults.DataBind()
+
+            If list.Count = 0 Then
+                pnlNoCategoryResults.Visible = True
+            End If
+        Catch ex As Exception
+            lblCategoryError.Text = "Unable to load categories"
+            lblCategoryError.Visible = True
+            rptCategoryResults.DataSource = Nothing
+            rptCategoryResults.DataBind()
+        End Try
+    End Sub
+
+    ' ── Brand Lookup Modal Logic ────────────────────────────────────────
+    Public Property IsBrandLookupOpen As Boolean
+        Get
+            If ViewState("IsBrandLookupOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsBrandLookupOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsBrandLookupOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnOpenBrandLookup_Click(sender As Object, e As EventArgs)
+        If txtBrand.ReadOnly Then Exit Sub
+        CloseAllLookupModals()
+        txtBrandSearch.Text = String.Empty
+        BindBrandLookupList(String.Empty)
+        IsBrandLookupOpen = True
+    End Sub
+
+    Protected Sub btnBrandSearch_Click(sender As Object, e As EventArgs)
+        Dim prefix As String = txtBrandSearch.Text.Trim()
+        If String.IsNullOrEmpty(prefix) AndAlso Request.Form(txtBrandSearch.UniqueID) IsNot Nothing Then
+            prefix = Request.Form(txtBrandSearch.UniqueID).Trim()
+        End If
+        txtBrandSearch.Text = prefix
+        BindBrandLookupList(prefix)
+        IsBrandLookupOpen = True
+    End Sub
+
+    Protected Sub btnCloseBrandLookup_Click(sender As Object, e As EventArgs)
+        IsBrandLookupOpen = False
+    End Sub
+
+    Protected Sub rptBrandResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim selectedBrand As String = e.CommandArgument.ToString()
+            txtBrand.Text = selectedBrand
+            IsBrandLookupOpen = False
+        End If
+    End Sub
+
+    Private Sub BindBrandLookupList(prefix As String)
+        lblBrandError.Visible = False
+        pnlNoBrandResults.Visible = False
+        Dim list As New List(Of BrandItem)()
+
+        Try
+            Using conn As OracleConnection = DbHelper.GetConnection()
+                Dim sql As String
+                If String.IsNullOrEmpty(prefix) Then
+                    sql = "SELECT BRAND_ID, BRAND_NAME FROM M_BRANDS ORDER BY BRAND_ID ASC"
+                Else
+                    sql = "SELECT BRAND_ID, BRAND_NAME FROM M_BRANDS WHERE UPPER(BRAND_NAME) LIKE UPPER(:prefix) ORDER BY BRAND_ID ASC"
+                End If
+
+                Using cmd As New OracleCommand(sql, conn)
+                    cmd.BindByName = True
+                    If Not String.IsNullOrEmpty(prefix) Then
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                    End If
+
+                    Using reader As OracleDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            list.Add(New BrandItem() With {
+                                .BrandId = If(reader("BRAND_ID") IsNot DBNull.Value, reader("BRAND_ID").ToString(), ""),
+                                .BrandName = If(reader("BRAND_NAME") IsNot DBNull.Value, reader("BRAND_NAME").ToString(), "")
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            rptBrandResults.DataSource = list
+            rptBrandResults.DataBind()
+
+            If list.Count = 0 Then
+                pnlNoBrandResults.Visible = True
+            End If
+        Catch ex As Exception
+            lblBrandError.Text = "Unable to load brands"
+            lblBrandError.Visible = True
+            rptBrandResults.DataSource = Nothing
+            rptBrandResults.DataBind()
+        End Try
+    End Sub
+
+    ' ── Section Lookup Modal Logic ──────────────────────────────────────
+    Public Property IsSectionLookupOpen As Boolean
+        Get
+            If ViewState("IsSectionLookupOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsSectionLookupOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsSectionLookupOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnOpenSectionLookup_Click(sender As Object, e As EventArgs)
+        If txtSection.ReadOnly Then Exit Sub
+        CloseAllLookupModals()
+        txtSectionSearch.Text = String.Empty
+        BindSectionLookupList(String.Empty)
+        IsSectionLookupOpen = True
+    End Sub
+
+    Protected Sub btnSectionSearch_Click(sender As Object, e As EventArgs)
+        Dim prefix As String = txtSectionSearch.Text.Trim()
+        If String.IsNullOrEmpty(prefix) AndAlso Request.Form(txtSectionSearch.UniqueID) IsNot Nothing Then
+            prefix = Request.Form(txtSectionSearch.UniqueID).Trim()
+        End If
+        txtSectionSearch.Text = prefix
+        BindSectionLookupList(prefix)
+        IsSectionLookupOpen = True
+    End Sub
+
+    Protected Sub btnCloseSectionLookup_Click(sender As Object, e As EventArgs)
+        IsSectionLookupOpen = False
+    End Sub
+
+    Protected Sub rptSectionResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim selectedSection As String = e.CommandArgument.ToString()
+            txtSection.Text = selectedSection
+            IsSectionLookupOpen = False
+        End If
+    End Sub
+
+    Private Sub BindSectionLookupList(prefix As String)
+        lblSectionError.Visible = False
+        pnlNoSectionResults.Visible = False
+        Dim list As New List(Of SectionItem)()
+
+        Try
+            Using conn As OracleConnection = DbHelper.GetConnection()
+                Dim sql As String
+                If String.IsNullOrEmpty(prefix) Then
+                    sql = "SELECT SECTION_ID, SECTION FROM M_SECTION ORDER BY SECTION_ID ASC"
+                Else
+                    sql = "SELECT SECTION_ID, SECTION FROM M_SECTION WHERE UPPER(SECTION) LIKE UPPER(:prefix) ORDER BY SECTION_ID ASC"
+                End If
+
+                Using cmd As New OracleCommand(sql, conn)
+                    cmd.BindByName = True
+                    If Not String.IsNullOrEmpty(prefix) Then
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                    End If
+
+                    Using reader As OracleDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            list.Add(New SectionItem() With {
+                                .SectionId = If(reader("SECTION_ID") IsNot DBNull.Value, reader("SECTION_ID").ToString(), ""),
+                                .SectionName = If(reader("SECTION") IsNot DBNull.Value, reader("SECTION").ToString(), "")
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            rptSectionResults.DataSource = list
+            rptSectionResults.DataBind()
+
+            If list.Count = 0 Then
+                pnlNoSectionResults.Visible = True
+            End If
+        Catch ex As Exception
+            lblSectionError.Text = "Unable to load sections"
+            lblSectionError.Visible = True
+            rptSectionResults.DataSource = Nothing
+            rptSectionResults.DataBind()
+        End Try
+    End Sub
+
+    ' ── Budget Utilized From Lookup Modal Logic ─────────────────────────
+    Public Property IsBudgetLookupOpen As Boolean
+        Get
+            If ViewState("IsBudgetLookupOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsBudgetLookupOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsBudgetLookupOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnOpenBudgetLookup_Click(sender As Object, e As EventArgs)
+        If txtBudgetUtilizedFrom.ReadOnly Then Exit Sub
+        CloseAllLookupModals()
+        txtBudgetSearch.Text = String.Empty
+        BindBudgetLookupList(String.Empty)
+        IsBudgetLookupOpen = True
+    End Sub
+
+    Protected Sub btnBudgetSearch_Click(sender As Object, e As EventArgs)
+        Dim prefix As String = txtBudgetSearch.Text.Trim()
+        If String.IsNullOrEmpty(prefix) AndAlso Request.Form(txtBudgetSearch.UniqueID) IsNot Nothing Then
+            prefix = Request.Form(txtBudgetSearch.UniqueID).Trim()
+        End If
+        txtBudgetSearch.Text = prefix
+        BindBudgetLookupList(prefix)
+        IsBudgetLookupOpen = True
+    End Sub
+
+    Protected Sub btnCloseBudgetLookup_Click(sender As Object, e As EventArgs)
+        IsBudgetLookupOpen = False
+    End Sub
+
+    Protected Sub rptBudgetResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim selectedBudget As String = e.CommandArgument.ToString()
+            txtBudgetUtilizedFrom.Text = selectedBudget
+            IsBudgetLookupOpen = False
+        End If
+    End Sub
+
+    Private Sub BindBudgetLookupList(prefix As String)
+        lblBudgetError.Visible = False
+        pnlNoBudgetResults.Visible = False
+        Dim list As New List(Of BudgetItem)()
+
+        Try
+            Using conn As OracleConnection = DbHelper.GetConnection()
+                Dim sql As String
+                If String.IsNullOrEmpty(prefix) Then
+                    sql = "SELECT BUDGET_UTILIZING_ACC_ID, BUDGET_UTILIZING_ACC_NAME FROM M_BUDGET_UTILIZED_ACC ORDER BY BUDGET_UTILIZING_ACC_ID ASC"
+                Else
+                    sql = "SELECT BUDGET_UTILIZING_ACC_ID, BUDGET_UTILIZING_ACC_NAME FROM M_BUDGET_UTILIZED_ACC WHERE UPPER(BUDGET_UTILIZING_ACC_NAME) LIKE UPPER(:prefix) ORDER BY BUDGET_UTILIZING_ACC_ID ASC"
+                End If
+
+                Using cmd As New OracleCommand(sql, conn)
+                    cmd.BindByName = True
+                    If Not String.IsNullOrEmpty(prefix) Then
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                    End If
+
+                    Using reader As OracleDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            list.Add(New BudgetItem() With {
+                                .BudgetAccountId = If(reader("BUDGET_UTILIZING_ACC_ID") IsNot DBNull.Value, reader("BUDGET_UTILIZING_ACC_ID").ToString(), ""),
+                                .BudgetAccountName = If(reader("BUDGET_UTILIZING_ACC_NAME") IsNot DBNull.Value, reader("BUDGET_UTILIZING_ACC_NAME").ToString(), "")
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            rptBudgetResults.DataSource = list
+            rptBudgetResults.DataBind()
+
+            If list.Count = 0 Then
+                pnlNoBudgetResults.Visible = True
+            End If
+        Catch ex As Exception
+            lblBudgetError.Text = "Unable to load budget accounts"
+            lblBudgetError.Visible = True
+            rptBudgetResults.DataSource = Nothing
+            rptBudgetResults.DataBind()
+        End Try
+    End Sub
+
+    ' ── Supplier Lookup Modal Logic ─────────────────────────────────────
+    Public Property IsSupplierLookupOpen As Boolean
+        Get
+            If ViewState("IsSupplierLookupOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsSupplierLookupOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsSupplierLookupOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnOpenSupplierLookup_Click(sender As Object, e As EventArgs)
+        If txtSupplier.ReadOnly Then Exit Sub
+        CloseAllLookupModals()
+        txtSupplierSearch.Text = String.Empty
+        BindSupplierLookupList(String.Empty)
+        IsSupplierLookupOpen = True
+    End Sub
+
+    Protected Sub btnSupplierSearch_Click(sender As Object, e As EventArgs)
+        Dim prefix As String = txtSupplierSearch.Text.Trim()
+        If String.IsNullOrEmpty(prefix) AndAlso Request.Form(txtSupplierSearch.UniqueID) IsNot Nothing Then
+            prefix = Request.Form(txtSupplierSearch.UniqueID).Trim()
+        End If
+        txtSupplierSearch.Text = prefix
+        BindSupplierLookupList(prefix)
+        IsSupplierLookupOpen = True
+    End Sub
+
+    Protected Sub btnCloseSupplierLookup_Click(sender As Object, e As EventArgs)
+        IsSupplierLookupOpen = False
+    End Sub
+
+    Protected Sub rptSupplierResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim selectedSupplier As String = e.CommandArgument.ToString()
+            txtSupplier.Text = selectedSupplier
+            IsSupplierLookupOpen = False
+        End If
+    End Sub
+
+    Private Sub BindSupplierLookupList(prefix As String)
+        lblSupplierError.Visible = False
+        pnlNoSupplierResults.Visible = False
+        Dim list As New List(Of SupplierItem)()
+
+        Try
+            Using conn As OracleConnection = DbHelper.GetConnection()
+                Dim sql As String
+                If String.IsNullOrEmpty(prefix) Then
+                    sql = "SELECT SUPPLIER_ID, SUPPLIER_NAME FROM M_SUPPLIER ORDER BY SUPPLIER_ID ASC"
+                Else
+                    sql = "SELECT SUPPLIER_ID, SUPPLIER_NAME FROM M_SUPPLIER WHERE UPPER(SUPPLIER_NAME) LIKE UPPER(:prefix) ORDER BY SUPPLIER_ID ASC"
+                End If
+
+                Using cmd As New OracleCommand(sql, conn)
+                    cmd.BindByName = True
+                    If Not String.IsNullOrEmpty(prefix) Then
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                    End If
+
+                    Using reader As OracleDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            list.Add(New SupplierItem() With {
+                                .SupplierId = If(reader("SUPPLIER_ID") IsNot DBNull.Value, reader("SUPPLIER_ID").ToString(), ""),
+                                .SupplierName = If(reader("SUPPLIER_NAME") IsNot DBNull.Value, reader("SUPPLIER_NAME").ToString(), "")
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            rptSupplierResults.DataSource = list
+            rptSupplierResults.DataBind()
+
+            If list.Count = 0 Then
+                pnlNoSupplierResults.Visible = True
+            End If
+        Catch ex As Exception
+            lblSupplierError.Text = "Unable to load suppliers"
+            lblSupplierError.Visible = True
+            rptSupplierResults.DataSource = Nothing
+            rptSupplierResults.DataBind()
+        End Try
+    End Sub
+
+    ' ── Purchase FY Lookup Modal Logic ──────────────────────────────────
+    Public Property IsPurchaseFYLookupOpen As Boolean
+        Get
+            If ViewState("IsPurchaseFYLookupOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsPurchaseFYLookupOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsPurchaseFYLookupOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnOpenPurchaseFYLookup_Click(sender As Object, e As EventArgs)
+        If txtPurchaseFY.ReadOnly Then Exit Sub
+        CloseAllLookupModals()
+        txtPurchaseFYSearch.Text = String.Empty
+        BindPurchaseFYLookupList(String.Empty)
+        IsPurchaseFYLookupOpen = True
+    End Sub
+
+    Protected Sub btnPurchaseFYSearch_Click(sender As Object, e As EventArgs)
+        Dim prefix As String = txtPurchaseFYSearch.Text.Trim()
+        If String.IsNullOrEmpty(prefix) AndAlso Request.Form(txtPurchaseFYSearch.UniqueID) IsNot Nothing Then
+            prefix = Request.Form(txtPurchaseFYSearch.UniqueID).Trim()
+        End If
+        txtPurchaseFYSearch.Text = prefix
+        BindPurchaseFYLookupList(prefix)
+        IsPurchaseFYLookupOpen = True
+    End Sub
+
+    Protected Sub btnClosePurchaseFYLookup_Click(sender As Object, e As EventArgs)
+        IsPurchaseFYLookupOpen = False
+    End Sub
+
+    Protected Sub rptPurchaseFYResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim selectedFY As String = e.CommandArgument.ToString()
+            txtPurchaseFY.Text = selectedFY
+            IsPurchaseFYLookupOpen = False
+        End If
+    End Sub
+
+    Private Sub BindPurchaseFYLookupList(prefix As String)
+        lblPurchaseFYError.Visible = False
+        pnlNoPurchaseFYResults.Visible = False
+        Dim list As New List(Of FinancialYearItem)()
+
+        Try
+            Using conn As OracleConnection = DbHelper.GetConnection()
+                Dim sql As String
+                If String.IsNullOrEmpty(prefix) Then
+                    sql = "SELECT FYID, TO_CHAR(FROM_DATE,'YYYY') || '-' || TO_CHAR(TO_DATE,'YY') AS FY_LABEL FROM M_FINANCIAL_YEAR WHERE ACTIVE = 'Y' ORDER BY FYID ASC"
+                Else
+                    sql = "SELECT FYID, TO_CHAR(FROM_DATE,'YYYY') || '-' || TO_CHAR(TO_DATE,'YY') AS FY_LABEL FROM M_FINANCIAL_YEAR WHERE ACTIVE = 'Y' AND (TO_CHAR(FROM_DATE,'YYYY') || '-' || TO_CHAR(TO_DATE,'YY')) LIKE :prefix ORDER BY FYID ASC"
+                End If
+
+                Using cmd As New OracleCommand(sql, conn)
+                    cmd.BindByName = True
+                    If Not String.IsNullOrEmpty(prefix) Then
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                    End If
+
+                    Using reader As OracleDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            list.Add(New FinancialYearItem() With {
+                                .FyId = If(reader("FYID") IsNot DBNull.Value, reader("FYID").ToString(), ""),
+                                .FyLabel = If(reader("FY_LABEL") IsNot DBNull.Value, reader("FY_LABEL").ToString(), "")
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            rptPurchaseFYResults.DataSource = list
+            rptPurchaseFYResults.DataBind()
+
+            If list.Count = 0 Then
+                pnlNoPurchaseFYResults.Visible = True
+            End If
+        Catch ex As Exception
+            lblPurchaseFYError.Text = "Unable to load financial years"
+            lblPurchaseFYError.Visible = True
+            rptPurchaseFYResults.DataSource = Nothing
+            rptPurchaseFYResults.DataBind()
+        End Try
+    End Sub
+
+    ' ── First Depr FY Lookup Modal Logic ─────────────────────────────────
+    Public Property IsFirstDeprFYLookupOpen As Boolean
+        Get
+            If ViewState("IsFirstDeprFYLookupOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsFirstDeprFYLookupOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsFirstDeprFYLookupOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnOpenFirstDeprFYLookup_Click(sender As Object, e As EventArgs)
+        If txtFirstDeprFY.ReadOnly Then Exit Sub
+        CloseAllLookupModals()
+        txtFirstDeprFYSearch.Text = String.Empty
+        BindFirstDeprFYLookupList(String.Empty)
+        IsFirstDeprFYLookupOpen = True
+    End Sub
+
+    Protected Sub btnFirstDeprFYSearch_Click(sender As Object, e As EventArgs)
+        Dim prefix As String = txtFirstDeprFYSearch.Text.Trim()
+        If String.IsNullOrEmpty(prefix) AndAlso Request.Form(txtFirstDeprFYSearch.UniqueID) IsNot Nothing Then
+            prefix = Request.Form(txtFirstDeprFYSearch.UniqueID).Trim()
+        End If
+        txtFirstDeprFYSearch.Text = prefix
+        BindFirstDeprFYLookupList(prefix)
+        IsFirstDeprFYLookupOpen = True
+    End Sub
+
+    Protected Sub btnCloseFirstDeprFYLookup_Click(sender As Object, e As EventArgs)
+        IsFirstDeprFYLookupOpen = False
+    End Sub
+
+    Protected Sub rptFirstDeprFYResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim selectedFY As String = e.CommandArgument.ToString()
+            txtFirstDeprFY.Text = selectedFY
+            IsFirstDeprFYLookupOpen = False
+        End If
+    End Sub
+
+    Private Sub BindFirstDeprFYLookupList(prefix As String)
+        lblFirstDeprFYError.Visible = False
+        pnlNoFirstDeprFYResults.Visible = False
+        Dim list As New List(Of FinancialYearItem)()
+
+        Try
+            Using conn As OracleConnection = DbHelper.GetConnection()
+                Dim sql As String
+                If String.IsNullOrEmpty(prefix) Then
+                    sql = "SELECT FYID, TO_CHAR(FROM_DATE,'YYYY') || '-' || TO_CHAR(TO_DATE,'YY') AS FY_LABEL FROM M_FINANCIAL_YEAR WHERE ACTIVE = 'Y' ORDER BY FYID ASC"
+                Else
+                    sql = "SELECT FYID, TO_CHAR(FROM_DATE,'YYYY') || '-' || TO_CHAR(TO_DATE,'YY') AS FY_LABEL FROM M_FINANCIAL_YEAR WHERE ACTIVE = 'Y' AND (TO_CHAR(FROM_DATE,'YYYY') || '-' || TO_CHAR(TO_DATE,'YY')) LIKE :prefix ORDER BY FYID ASC"
+                End If
+
+                Using cmd As New OracleCommand(sql, conn)
+                    cmd.BindByName = True
+                    If Not String.IsNullOrEmpty(prefix) Then
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                    End If
+
+                    Using reader As OracleDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            list.Add(New FinancialYearItem() With {
+                                .FyId = If(reader("FYID") IsNot DBNull.Value, reader("FYID").ToString(), ""),
+                                .FyLabel = If(reader("FY_LABEL") IsNot DBNull.Value, reader("FY_LABEL").ToString(), "")
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            rptFirstDeprFYResults.DataSource = list
+            rptFirstDeprFYResults.DataBind()
+
+            If list.Count = 0 Then
+                pnlNoFirstDeprFYResults.Visible = True
+            End If
+        Catch ex As Exception
+            lblFirstDeprFYError.Text = "Unable to load financial years"
+            lblFirstDeprFYError.Visible = True
+            rptFirstDeprFYResults.DataSource = Nothing
+            rptFirstDeprFYResults.DataBind()
+        End Try
+    End Sub
+
+    ' ── Last Depr FY Lookup Modal Logic ──────────────────────────────────
+    Public Property IsLastDeprFYLookupOpen As Boolean
+        Get
+            If ViewState("IsLastDeprFYLookupOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsLastDeprFYLookupOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsLastDeprFYLookupOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnOpenLastDeprFYLookup_Click(sender As Object, e As EventArgs)
+        If txtLastDeprFY.ReadOnly Then Exit Sub
+        CloseAllLookupModals()
+        txtLastDeprFYSearch.Text = String.Empty
+        BindLastDeprFYLookupList(String.Empty)
+        IsLastDeprFYLookupOpen = True
+    End Sub
+
+    Protected Sub btnLastDeprFYSearch_Click(sender As Object, e As EventArgs)
+        Dim prefix As String = txtLastDeprFYSearch.Text.Trim()
+        If String.IsNullOrEmpty(prefix) AndAlso Request.Form(txtLastDeprFYSearch.UniqueID) IsNot Nothing Then
+            prefix = Request.Form(txtLastDeprFYSearch.UniqueID).Trim()
+        End If
+        txtLastDeprFYSearch.Text = prefix
+        BindLastDeprFYLookupList(prefix)
+        IsLastDeprFYLookupOpen = True
+    End Sub
+
+    Protected Sub btnCloseLastDeprFYLookup_Click(sender As Object, e As EventArgs)
+        IsLastDeprFYLookupOpen = False
+    End Sub
+
+    Protected Sub rptLastDeprFYResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim selectedFY As String = e.CommandArgument.ToString()
+            txtLastDeprFY.Text = selectedFY
+            IsLastDeprFYLookupOpen = False
+        End If
+    End Sub
+
+    Private Sub BindLastDeprFYLookupList(prefix As String)
+        lblLastDeprFYError.Visible = False
+        pnlNoLastDeprFYResults.Visible = False
+        Dim list As New List(Of FinancialYearItem)()
+
+        Try
+            Using conn As OracleConnection = DbHelper.GetConnection()
+                Dim sql As String
+                If String.IsNullOrEmpty(prefix) Then
+                    sql = "SELECT FYID, TO_CHAR(FROM_DATE,'YYYY') || '-' || TO_CHAR(TO_DATE,'YY') AS FY_LABEL FROM M_FINANCIAL_YEAR WHERE ACTIVE = 'Y' ORDER BY FYID ASC"
+                Else
+                    sql = "SELECT FYID, TO_CHAR(FROM_DATE,'YYYY') || '-' || TO_CHAR(TO_DATE,'YY') AS FY_LABEL FROM M_FINANCIAL_YEAR WHERE ACTIVE = 'Y' AND (TO_CHAR(FROM_DATE,'YYYY') || '-' || TO_CHAR(TO_DATE,'YY')) LIKE :prefix ORDER BY FYID ASC"
+                End If
+
+                Using cmd As New OracleCommand(sql, conn)
+                    cmd.BindByName = True
+                    If Not String.IsNullOrEmpty(prefix) Then
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                    End If
+
+                    Using reader As OracleDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            list.Add(New FinancialYearItem() With {
+                                .FyId = If(reader("FYID") IsNot DBNull.Value, reader("FYID").ToString(), ""),
+                                .FyLabel = If(reader("FY_LABEL") IsNot DBNull.Value, reader("FY_LABEL").ToString(), "")
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            rptLastDeprFYResults.DataSource = list
+            rptLastDeprFYResults.DataBind()
+
+            If list.Count = 0 Then
+                pnlNoLastDeprFYResults.Visible = True
+            End If
+        Catch ex As Exception
+            lblLastDeprFYError.Text = "Unable to load financial years"
+            lblLastDeprFYError.Visible = True
+            rptLastDeprFYResults.DataSource = Nothing
+            rptLastDeprFYResults.DataBind()
+        End Try
+    End Sub
+
+    ' ── Disposal Reason Lookup Modal Logic ─────────────────────────────
+    Public Property IsDisposalReasonLookupOpen As Boolean
+        Get
+            If ViewState("IsDisposalReasonLookupOpen") IsNot Nothing Then
+                Return DirectCast(ViewState("IsDisposalReasonLookupOpen"), Boolean)
+            End If
+            Return False
+        End Get
+        Set(value As Boolean)
+            ViewState("IsDisposalReasonLookupOpen") = value
+        End Set
+    End Property
+
+    Protected Sub btnOpenDisposalReasonLookup_Click(sender As Object, e As EventArgs)
+        If txtDisposalReason.ReadOnly Then Exit Sub
+        CloseAllLookupModals()
+        txtDisposalReasonSearch.Text = String.Empty
+        BindDisposalReasonLookupList(String.Empty)
+        IsDisposalReasonLookupOpen = True
+    End Sub
+
+    Protected Sub btnDisposalReasonSearch_Click(sender As Object, e As EventArgs)
+        Dim prefix As String = txtDisposalReasonSearch.Text.Trim()
+        If String.IsNullOrEmpty(prefix) AndAlso Request.Form(txtDisposalReasonSearch.UniqueID) IsNot Nothing Then
+            prefix = Request.Form(txtDisposalReasonSearch.UniqueID).Trim()
+        End If
+        txtDisposalReasonSearch.Text = prefix
+        BindDisposalReasonLookupList(prefix)
+        IsDisposalReasonLookupOpen = True
+    End Sub
+
+    Protected Sub btnCloseDisposalReasonLookup_Click(sender As Object, e As EventArgs)
+        IsDisposalReasonLookupOpen = False
+    End Sub
+
+    Protected Sub rptDisposalReasonResults_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
+        If e.CommandName = "Select" Then
+            Dim selectedReason As String = e.CommandArgument.ToString()
+            txtDisposalReason.Text = selectedReason
+            IsDisposalReasonLookupOpen = False
+        End If
+    End Sub
+
+    Private Sub BindDisposalReasonLookupList(prefix As String)
+        lblDisposalReasonError.Visible = False
+        pnlNoDisposalReasonResults.Visible = False
+        Dim list As New List(Of DisposalReasonItem)()
+
+        Try
+            Using conn As OracleConnection = DbHelper.GetConnection()
+                Dim sql As String
+                If String.IsNullOrEmpty(prefix) Then
+                    sql = "SELECT DISPOSAL_REASON_ID, DISPOSAL_REASON FROM M_DISPOSAL_REASON ORDER BY DISPOSAL_REASON_ID ASC"
+                Else
+                    sql = "SELECT DISPOSAL_REASON_ID, DISPOSAL_REASON FROM M_DISPOSAL_REASON WHERE UPPER(DISPOSAL_REASON) LIKE UPPER(:prefix) ORDER BY DISPOSAL_REASON_ID ASC"
+                End If
+
+                Using cmd As New OracleCommand(sql, conn)
+                    cmd.BindByName = True
+                    If Not String.IsNullOrEmpty(prefix) Then
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                    End If
+
+                    Using reader As OracleDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            list.Add(New DisposalReasonItem() With {
+                                .DisposalReasonId = If(reader("DISPOSAL_REASON_ID") IsNot DBNull.Value, reader("DISPOSAL_REASON_ID").ToString(), ""),
+                                .DisposalReasonName = If(reader("DISPOSAL_REASON") IsNot DBNull.Value, reader("DISPOSAL_REASON").ToString(), "")
+                            })
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            rptDisposalReasonResults.DataSource = list
+            rptDisposalReasonResults.DataBind()
+
+            If list.Count = 0 Then
+                pnlNoDisposalReasonResults.Visible = True
+            End If
+        Catch ex As Exception
+            lblDisposalReasonError.Text = "Unable to load disposal reasons"
+            lblDisposalReasonError.Visible = True
+            rptDisposalReasonResults.DataSource = Nothing
+            rptDisposalReasonResults.DataBind()
+        End Try
     End Sub
 
     ' Stubs for legacy task control compiler-friendliness
