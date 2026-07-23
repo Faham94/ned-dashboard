@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>Sign In - VB.NET Web App</title>
+    <title>Asset Management System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -173,7 +173,7 @@
 <body>
     <form id="form1" runat="server" autocomplete="off">
         <div class="container">
-            <h1>Antigravity IDE</h1>
+            <h1>Asset Management System</h1>
             <p class="subtitle">Sign in to your account</p>
             
             <div class="form-group">

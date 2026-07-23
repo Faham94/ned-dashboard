@@ -28,7 +28,7 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\vbc.exe ^
     /r:System.Web.dll,System.dll,System.Core.dll,System.Configuration.dll ^
     /r:bin\Oracle.ManagedDataAccess.dll ^
     /out:ServerLib.dll ^
-    Server.vb DbHelper.vb
+    Server.vb DbHelper.vb RawPrinterHelper.vb
 if %errorlevel% neq 0 (
     echo [ERROR] Failed to compile ServerLib.dll
     exit /b %errorlevel%

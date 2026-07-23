@@ -18,6 +18,7 @@ End Class
 <Serializable>
 Public Class SectionItem
     Public Property SectionId As String
+    Public Property Department As String
     Public Property SectionName As String
 End Class
 
@@ -391,7 +392,6 @@ Partial Public Class DashboardPage
             ' 3. Populate university dashboard labels
             lblInstitutionName.Text = "National University of Engineering & Development"
             lblDepartmentName.Text = "Department of Information Technology"
-            lblSystemTitle.Text = "Asset Management System"
             lblCopyrightDepartment.Text = "Department of Information Technology"
 
             ' 4. Populate user profile details
@@ -486,21 +486,21 @@ Partial Public Class DashboardPage
     ''' Validates form and inserts or updates asset record in Session.
     ''' </summary>
     Protected Sub btnSave_Click(sender As Object, e As EventArgs)
-        Dim assetId As String = txtAssetId.Text.Trim()
+        ' ── Always close every lookup modal first so no popup re-renders ──────
+        CloseAllLookupModals()
+
         Dim description As String = txtDescription.Text.Trim()
         Dim category As String = txtCategory.Text.Trim()
         Dim brand As String = txtBrand.Text.Trim()
         Dim section As String = txtSection.Text.Trim()
         Dim budget As String = txtBudgetUtilizedFrom.Text.Trim()
-        Dim supplier As String = txtSupplier.Text.Trim()
 
-        ' Validation of 5 required fields: Category, Brand, Section, Budget Utilized From, Supplier
+        ' Validation of required fields (Supplier intentionally excluded from DB insert but still required for UX)
         Dim missingList As New List(Of String)()
         If String.IsNullOrEmpty(category) Then missingList.Add("Asset Category")
         If String.IsNullOrEmpty(brand) Then missingList.Add("Brand")
         If String.IsNullOrEmpty(section) Then missingList.Add("Section")
         If String.IsNullOrEmpty(budget) Then missingList.Add("Budget Utilized From")
-        If String.IsNullOrEmpty(supplier) Then missingList.Add("Supplier")
 
         If missingList.Count > 0 Then
             lblFormMessage.Text = "Please fill " & String.Join(", ", missingList) & "."
@@ -510,23 +510,235 @@ Partial Public Class DashboardPage
             Exit Sub
         End If
 
+        ' Validate Purchase Date format (server-side check)
+        Dim purchaseDate As String = txtPurchaseDate.Text.Trim()
+        If Not String.IsNullOrEmpty(purchaseDate) Then
+            Dim parsedDate As DateTime
+            If Not DateTime.TryParseExact(purchaseDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, parsedDate) Then
+                lblFormMessage.Text = "Please enter a valid date (DD/MM/YYYY)"
+                lblFormMessage.CssClass = "msg-label error-msg"
+                lblFormMessage.Style("display") = "block"
+                lblFormMessage.Visible = True
+                Exit Sub
+            End If
+        End If
+
+        ' Validate Warranty Exp format (server-side check)
+        Dim warrantyExp As String = txtWarrantyExp.Text.Trim()
+        If Not String.IsNullOrEmpty(warrantyExp) Then
+            Dim parsedDate As DateTime
+            If Not DateTime.TryParseExact(warrantyExp, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, parsedDate) Then
+                lblFormMessage.Text = "Please enter a valid date (DD/MM/YYYY)"
+                lblFormMessage.CssClass = "msg-label error-msg"
+                lblFormMessage.Style("display") = "block"
+                lblFormMessage.Visible = True
+                Exit Sub
+            End If
+        End If
+
         lblFormMessage.Text = String.Empty
         lblFormMessage.Style("display") = "none"
 
         Dim assets As List(Of AssetItem) = CType(Session("AssetList"), List(Of AssetItem))
-        Dim asset As AssetItem = Nothing
         Dim mode As String = If(ViewState("CurrentMode") IsNot Nothing, ViewState("CurrentMode").ToString(), "View")
 
         If mode = "New" Then
-            ' Assert uniqueness
-            If assets.Any(Function(a) a.AssetId = assetId) Then
-                ClientScript.RegisterStartupScript(Me.GetType(), "alert", "alert('Conflict: Asset ID already exists!');", True)
-                Exit Sub
-            End If
-            asset = New AssetItem()
-            asset.AssetId = assetId
-            assets.Add(asset)
+            ' ── New mode: perform real Oracle INSERT ──────────────────────────
+            Try
+                Using conn As OracleConnection = DbHelper.GetConnection()
+
+                    ' 1. Generate next ASSET_ID
+                    Dim newAssetId As Long
+                    Using cmd As New OracleCommand("SELECT NVL(MAX(ASSET_ID), 0) + 1 FROM ASSET_INFORMATION", conn)
+                        newAssetId = Convert.ToInt64(cmd.ExecuteScalar())
+                    End Using
+                    Dim assetTag As String = newAssetId.ToString().PadLeft(10, "0"c)
+
+                    ' 2. Look up BRAND_ID (nullable)
+                    Dim brandId As Object = DBNull.Value
+                    If Not String.IsNullOrEmpty(brand) Then
+                        Using cmd As New OracleCommand("SELECT BRAND_ID FROM M_BRANDS WHERE UPPER(BRAND_NAME) = UPPER(:name)", conn)
+                            cmd.BindByName = True
+                            cmd.Parameters.Add("name", OracleDbType.Varchar2).Value = brand
+                            Dim result As Object = cmd.ExecuteScalar()
+                            If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                                brandId = result
+                            Else
+                                lblFormMessage.Text = "Brand """ & brand & """ not found. Please select a valid brand using the lookup."
+                                lblFormMessage.CssClass = "msg-label error-msg"
+                                lblFormMessage.Style("display") = "block"
+                                lblFormMessage.Visible = True
+                                Exit Sub
+                            End If
+                        End Using
+                    End If
+
+                    ' 3. Look up BUDGET_UTILIZING_ACC_ID (NOT NULL)
+                    Dim budgetId As Object = DBNull.Value
+                    Using cmd As New OracleCommand("SELECT BUDGET_UTILIZING_ACC_ID FROM M_BUDGET_UTILIZED_ACC WHERE UPPER(BUDGET_UTILIZING_ACC_NAME) = UPPER(:name)", conn)
+                        cmd.BindByName = True
+                        cmd.Parameters.Add("name", OracleDbType.Varchar2).Value = budget
+                        Dim result As Object = cmd.ExecuteScalar()
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            budgetId = result
+                        Else
+                            lblFormMessage.Text = "Budget account """ & budget & """ not found. Please select a valid account using the lookup."
+                            lblFormMessage.CssClass = "msg-label error-msg"
+                            lblFormMessage.Style("display") = "block"
+                            lblFormMessage.Visible = True
+                            Exit Sub
+                        End If
+                    End Using
+
+                    ' 4. Look up CATEGORY_ID (NOT NULL)
+                    Dim categoryId As Object = DBNull.Value
+                    Using cmd As New OracleCommand("SELECT CATEGORY_ID FROM M_CATEGORY WHERE UPPER(CATEGORY) = UPPER(:name)", conn)
+                        cmd.BindByName = True
+                        cmd.Parameters.Add("name", OracleDbType.Varchar2).Value = category
+                        Dim result As Object = cmd.ExecuteScalar()
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            categoryId = result
+                        Else
+                            lblFormMessage.Text = "Category """ & category & """ not found. Please select a valid category using the lookup."
+                            lblFormMessage.CssClass = "msg-label error-msg"
+                            lblFormMessage.Style("display") = "block"
+                            lblFormMessage.Visible = True
+                            Exit Sub
+                        End If
+                    End Using
+
+                    ' 5. Look up SECTION_ID (NOT NULL)
+                    Dim sectionId As Object = DBNull.Value
+                    Using cmd As New OracleCommand("SELECT SECTION_ID FROM M_SECTION WHERE UPPER(SECTION) = UPPER(:name)", conn)
+                        cmd.BindByName = True
+                        cmd.Parameters.Add("name", OracleDbType.Varchar2).Value = section
+                        Dim result As Object = cmd.ExecuteScalar()
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            sectionId = result
+                        Else
+                            lblFormMessage.Text = "Section """ & section & """ not found. Please select a valid section using the lookup."
+                            lblFormMessage.CssClass = "msg-label error-msg"
+                            lblFormMessage.Style("display") = "block"
+                            lblFormMessage.Visible = True
+                            Exit Sub
+                        End If
+                    End Using
+
+                    ' 6. Look up STATUS_ID (NOT NULL) — dropdown uses text like "Active", "Disposed"
+                    Dim statusText As String = ddlStatus.SelectedValue
+                    Dim statusId As Object = DBNull.Value
+                    Using cmd As New OracleCommand("SELECT STATUS_ID FROM M_STATUS WHERE UPPER(STATUS_TYPE) = UPPER(:name)", conn)
+                        cmd.BindByName = True
+                        cmd.Parameters.Add("name", OracleDbType.Varchar2).Value = statusText
+                        Dim result As Object = cmd.ExecuteScalar()
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            statusId = result
+                        Else
+                            statusId = 1 ' Default to Active if lookup fails
+                        End If
+                    End Using
+
+                    ' 7. Parse dates
+                    Dim purchaseDateVal As Object = DBNull.Value
+                    If Not String.IsNullOrEmpty(purchaseDate) Then
+                        Dim dt As DateTime
+                        If DateTime.TryParseExact(purchaseDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dt) Then
+                            purchaseDateVal = dt
+                        End If
+                    End If
+                    If purchaseDateVal Is DBNull.Value Then
+                        purchaseDateVal = DateTime.Today   ' PURCHASE_DATE is NOT NULL — default to today
+                    End If
+
+                    Dim warrantyDateVal As Object = DBNull.Value
+                    If Not String.IsNullOrEmpty(warrantyExp) Then
+                        Dim dt As DateTime
+                        If DateTime.TryParseExact(warrantyExp, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dt) Then
+                            warrantyDateVal = dt
+                        End If
+                    End If
+
+                    ' 8. Resolve ORIGINAL_COST and LOCATION_ROOM
+                    Dim originalCost As Decimal = SafeDecimal(txtOriginalCost.Text)
+                    Dim locationRoom As String = txtLocation.Text.Trim()
+                    If String.IsNullOrEmpty(locationRoom) Then locationRoom = "N/A"
+
+                    ' 9. Execute parameterized INSERT
+                    Dim insertSql As String =
+                        "INSERT INTO ASSET_INFORMATION " &
+                        "(ASSET_ID, ASSET_TAG, ASSET_NAME, ITEM_SERIAL_NO, MODEL_NO, " &
+                        " BRAND_ID, BUDGET_UTILIZING_ACC_ID, ORIGINAL_COST, PURCHASE_DATE, " &
+                        " WARRANTY_EXPIRY_DATE, CATEGORY_ID, SECTION_ID, EMP_NAME, " &
+                        " LOCATION_ROOM, STATUS_ID, ORGANIZATION_ID) " &
+                        "VALUES " &
+                        "(:p_asset_id, :p_asset_tag, :p_asset_name, :p_serial_no, :p_model_no, " &
+                        " :p_brand_id, :p_budget_id, :p_original_cost, :p_purchase_date, " &
+                        " :p_warranty_date, :p_category_id, :p_section_id, :p_emp_name, " &
+                        " :p_location_room, :p_status_id, :p_org_id)"
+
+                    Using cmd As New OracleCommand(insertSql, conn)
+                        cmd.BindByName = True
+                        cmd.Parameters.Add("p_asset_id", OracleDbType.Int64).Value = newAssetId
+                        cmd.Parameters.Add("p_asset_tag", OracleDbType.Varchar2).Value = assetTag
+                        cmd.Parameters.Add("p_asset_name", OracleDbType.Varchar2).Value = If(String.IsNullOrEmpty(description), assetTag, description)
+                        cmd.Parameters.Add("p_serial_no", OracleDbType.Varchar2).Value = If(String.IsNullOrEmpty(txtSerialNo.Text.Trim()), CType(DBNull.Value, Object), CType(txtSerialNo.Text.Trim(), Object))
+                        cmd.Parameters.Add("p_model_no", OracleDbType.Varchar2).Value = If(String.IsNullOrEmpty(txtModelNo.Text.Trim()), CType(DBNull.Value, Object), CType(txtModelNo.Text.Trim(), Object))
+                        cmd.Parameters.Add("p_brand_id", OracleDbType.Int64).Value = brandId
+                        cmd.Parameters.Add("p_budget_id", OracleDbType.Int64).Value = budgetId
+                        cmd.Parameters.Add("p_original_cost", OracleDbType.Decimal).Value = originalCost
+                        cmd.Parameters.Add("p_purchase_date", OracleDbType.Date).Value = purchaseDateVal
+                        cmd.Parameters.Add("p_warranty_date", OracleDbType.Date).Value = warrantyDateVal
+                        cmd.Parameters.Add("p_category_id", OracleDbType.Int64).Value = categoryId
+                        cmd.Parameters.Add("p_section_id", OracleDbType.Int64).Value = sectionId
+                        cmd.Parameters.Add("p_emp_name", OracleDbType.Varchar2).Value = If(String.IsNullOrEmpty(txtEmployee.Text.Trim()), CType(DBNull.Value, Object), CType(txtEmployee.Text.Trim(), Object))
+                        cmd.Parameters.Add("p_location_room", OracleDbType.Varchar2).Value = locationRoom
+                        cmd.Parameters.Add("p_status_id", OracleDbType.Int64).Value = statusId
+                        cmd.Parameters.Add("p_org_id", OracleDbType.Int64).Value = 1   ' Default org
+                        cmd.ExecuteNonQuery()
+                    End Using
+
+                    ' 10. Add to in-memory session list so the Data View updates immediately
+                    Dim newAsset As New AssetItem()
+                    newAsset.AssetId = assetTag
+                    newAsset.Description = If(String.IsNullOrEmpty(description), assetTag, description)
+                    newAsset.Category = category
+                    newAsset.Brand = brand
+                    newAsset.ModelNo = txtModelNo.Text.Trim()
+                    newAsset.SerialNo = txtSerialNo.Text.Trim()
+                    newAsset.Section = section
+                    newAsset.Location = locationRoom
+                    newAsset.Employee = txtEmployee.Text.Trim()
+                    newAsset.BudgetUtilizedFrom = budget
+                    newAsset.Supplier = txtSupplier.Text.Trim()
+                    newAsset.OriginalCost = originalCost
+                    newAsset.PurchaseDate = purchaseDate
+                    newAsset.WarrantyExp = warrantyExp
+                    newAsset.Status = statusText
+                    assets.Add(newAsset)
+                    Session("AssetList") = assets
+
+                    ViewState("SelectedAssetId") = assetTag
+                    ViewState("CurrentMode") = "View"
+                    SetFormReadOnly(True)
+                    BindAssetList()
+                    LoadAsset(assetTag)
+
+                    ' Write success message AFTER LoadAsset() so it is not cleared
+                    lblFormMessage.Text = "Asset """ & assetTag & """ saved successfully."
+                    lblFormMessage.CssClass = "msg-label success-msg"
+                    lblFormMessage.Style("display") = "block"
+                    lblFormMessage.Visible = True
+                End Using
+
+            Catch ex As Exception
+                lblFormMessage.Text = "Database error: " & ex.Message
+                lblFormMessage.CssClass = "msg-label error-msg"
+                lblFormMessage.Style("display") = "block"
+                lblFormMessage.Visible = True
+            End Try
+
         ElseIf mode = "Edit" Then
+            Dim asset As AssetItem = Nothing
             If ViewState("SelectedAssetId") IsNot Nothing Then
                 Dim selectedId As String = ViewState("SelectedAssetId").ToString()
                 asset = assets.FirstOrDefault(Function(a) a.AssetId = selectedId)
@@ -535,10 +747,8 @@ Partial Public Class DashboardPage
                 ClientScript.RegisterStartupScript(Me.GetType(), "alert", "alert('Error: Loaded asset record could not be found.');", True)
                 Exit Sub
             End If
-        End If
 
-        If asset IsNot Nothing Then
-            ' Set input properties
+            ' Update in-memory session list (Edit mode does not yet write to DB)
             asset.Description = description
             asset.Category = category
             asset.Brand = txtBrand.Text.Trim()
@@ -551,19 +761,11 @@ Partial Public Class DashboardPage
             asset.Supplier = txtSupplier.Text.Trim()
             asset.InvoiceNo = txtInvoiceNo.Text.Trim()
             asset.ContractSchNo = txtContractSchNo.Text.Trim()
-            
             asset.OriginalCost = SafeDecimal(txtOriginalCost.Text)
-            asset.CurrentValue = SafeDecimal(txtCurrentValue.Text)
-            asset.AccDeprec = SafeDecimal(txtAccDeprec.Text)
-            asset.FYOpeningBal = SafeDecimal(txtFYOpeningBal.Text)
-            asset.FYClosingBal = SafeDecimal(txtFYClosingBal.Text)
-            
             asset.PurchaseDate = txtPurchaseDate.Text.Trim()
             asset.PurchaseFY = txtPurchaseFY.Text.Trim()
             asset.WarrantyExp = txtWarrantyExp.Text.Trim()
             asset.DepStartDate = txtDepStartDate.Text.Trim()
-            asset.FirstDeprFY = txtFirstDeprFY.Text.Trim()
-            asset.LastDeprFY = txtLastDeprFY.Text.Trim()
             asset.DisposalDate = txtDisposalDate.Text.Trim()
             asset.DisposalReason = txtDisposalReason.Text.Trim()
             asset.Remarks = txtRemarks.Text.Trim()
@@ -572,14 +774,13 @@ Partial Public Class DashboardPage
             asset.EntryDate = txtEntryDate.Text.Trim()
 
             Session("AssetList") = assets
-            ViewState("SelectedAssetId") = asset.AssetId
             ViewState("CurrentMode") = "View"
-
             SetFormReadOnly(True)
             BindAssetList()
             LoadAsset(asset.AssetId)
         End If
     End Sub
+
 
     ''' <summary>
     ''' Cancels current modifications and reverts to view state.
@@ -681,9 +882,9 @@ Partial Public Class DashboardPage
         txtDepStartDate.Text = asset.DepStartDate
         txtFirstDeprFY.Text = asset.FirstDeprFY
         txtLastDeprFY.Text = asset.LastDeprFY
-        txtPurchaseDate.Text = asset.PurchaseDate
+        txtPurchaseDate.Text = FormatToDisplayDate(asset.PurchaseDate)
         txtPurchaseFY.Text = asset.PurchaseFY
-        txtWarrantyExp.Text = asset.WarrantyExp
+        txtWarrantyExp.Text = FormatToDisplayDate(asset.WarrantyExp)
         txtDisposalDate.Text = asset.DisposalDate
         txtDisposalReason.Text = asset.DisposalReason
         txtRemarks.Text = asset.Remarks
@@ -757,14 +958,14 @@ Partial Public Class DashboardPage
         txtContractSchNo.ReadOnly = isReadOnly
         
         txtOriginalCost.ReadOnly = isReadOnly
-        txtCurrentValue.ReadOnly = isReadOnly
-        txtAccDeprec.ReadOnly = isReadOnly
-        txtFYOpeningBal.ReadOnly = isReadOnly
-        txtFYClosingBal.ReadOnly = isReadOnly
+        txtCurrentValue.ReadOnly = True
+        txtAccDeprec.ReadOnly = True
+        txtFYOpeningBal.ReadOnly = True
+        txtFYClosingBal.ReadOnly = True
         
         txtDepStartDate.ReadOnly = isReadOnly
-        txtFirstDeprFY.ReadOnly = isReadOnly
-        txtLastDeprFY.ReadOnly = isReadOnly
+        txtFirstDeprFY.ReadOnly = True
+        txtLastDeprFY.ReadOnly = True
         txtPurchaseDate.ReadOnly = isReadOnly
         txtPurchaseFY.ReadOnly = isReadOnly
         txtWarrantyExp.ReadOnly = isReadOnly
@@ -775,6 +976,14 @@ Partial Public Class DashboardPage
         txtEntryDate.ReadOnly = isReadOnly
         
         ddlStatus.Enabled = Not isReadOnly
+        
+        ' Hide Asset Status box and QR / Print Tag section in New mode
+        Dim mode As String = If(ViewState("CurrentMode") IsNot Nothing, ViewState("CurrentMode").ToString(), "View")
+        If mode = "New" Then
+            divAssetTagBox.Visible = False
+        Else
+            divAssetTagBox.Visible = True
+        End If
     End Sub
 
     Private Sub UpdateStatusBadge(status As String)
@@ -792,6 +1001,36 @@ Partial Public Class DashboardPage
             Return val
         End If
         Return 0
+    End Function
+
+    Private Function FormatToDisplayDate(dbDateStr As String) As String
+        If String.IsNullOrEmpty(dbDateStr) Then Return String.Empty
+        Dim dt As DateTime
+        If DateTime.TryParseExact(dbDateStr, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dt) Then
+            Return dt.ToString("dd/MM/yyyy")
+        End If
+        If DateTime.TryParseExact(dbDateStr, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dt) Then
+            Return dt.ToString("dd/MM/yyyy")
+        End If
+        If DateTime.TryParse(dbDateStr, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dt) Then
+            Return dt.ToString("dd/MM/yyyy")
+        End If
+        Return dbDateStr
+    End Function
+
+    Private Function SafeParseDate(dateStr As String) As DateTime?
+        If String.IsNullOrEmpty(dateStr) Then Return Nothing
+        Dim dt As DateTime
+        If DateTime.TryParseExact(dateStr, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dt) Then
+            Return dt
+        End If
+        If DateTime.TryParseExact(dateStr, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dt) Then
+            Return dt
+        End If
+        If DateTime.TryParse(dateStr, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, dt) Then
+            Return dt
+        End If
+        Return Nothing
     End Function
 
     Public Property IsSearchModalOpen As Boolean
@@ -886,9 +1125,9 @@ Partial Public Class DashboardPage
             Dim parsedDate As DateTime
             If DateTime.TryParseExact(searchDateStr, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, parsedDate) Then
                 filtered = filtered.Where(Function(a)
-                    Dim assetDate As DateTime
-                    If DateTime.TryParse(a.PurchaseDate, assetDate) Then
-                        Return assetDate.Date = parsedDate.Date
+                    Dim assetDate As DateTime? = SafeParseDate(a.PurchaseDate)
+                    If assetDate.HasValue Then
+                        Return assetDate.Value.Date = parsedDate.Date
                     End If
                     Return False
                 End Function)
@@ -1130,21 +1369,31 @@ Partial Public Class DashboardPage
             Using conn As OracleConnection = DbHelper.GetConnection()
                 Dim sql As String
                 If String.IsNullOrEmpty(prefix) Then
-                    sql = "SELECT SECTION_ID, SECTION FROM M_SECTION ORDER BY SECTION_ID ASC"
+                    sql = "SELECT s.SECTION_ID, d.DEPT, s.SECTION " &
+                          "FROM M_SECTION s " &
+                          "INNER JOIN M_DEPARTMENT d ON s.DEPT_ID = d.DEPT_ID " &
+                          "AND s.ORGANIZATION_ID = d.ORGANIZATION_ID " &
+                          "ORDER BY d.DEPT_ID"
                 Else
-                    sql = "SELECT SECTION_ID, SECTION FROM M_SECTION WHERE UPPER(SECTION) LIKE UPPER(:prefix) ORDER BY SECTION_ID ASC"
+                    sql = "SELECT s.SECTION_ID, d.DEPT, s.SECTION " &
+                          "FROM M_SECTION s " &
+                          "INNER JOIN M_DEPARTMENT d ON s.DEPT_ID = d.DEPT_ID " &
+                          "AND s.ORGANIZATION_ID = d.ORGANIZATION_ID " &
+                          "WHERE UPPER(s.SECTION) LIKE UPPER(:prefix) || '%' " &
+                          "ORDER BY d.DEPT_ID"
                 End If
 
                 Using cmd As New OracleCommand(sql, conn)
                     cmd.BindByName = True
                     If Not String.IsNullOrEmpty(prefix) Then
-                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim() & "%"
+                        cmd.Parameters.Add("prefix", OracleDbType.Varchar2).Value = prefix.Trim()
                     End If
 
                     Using reader As OracleDataReader = cmd.ExecuteReader()
                         While reader.Read()
                             list.Add(New SectionItem() With {
                                 .SectionId = If(reader("SECTION_ID") IsNot DBNull.Value, reader("SECTION_ID").ToString(), ""),
+                                .Department = If(reader("DEPT") IsNot DBNull.Value, reader("DEPT").ToString(), ""),
                                 .SectionName = If(reader("SECTION") IsNot DBNull.Value, reader("SECTION").ToString(), "")
                             })
                         End While
@@ -1701,5 +1950,32 @@ Partial Public Class DashboardPage
 
     Protected Sub rptTasks_ItemCommand(source As Object, e As Global.System.Web.UI.WebControls.RepeaterCommandEventArgs)
         ' Legacy handler stub (no functional implementation needed)
+    End Sub
+    Protected Sub btnPrintTag_Click(sender As Object, e As EventArgs)
+        Try
+            Dim assetId As String = txtAssetId.Text
+            Dim description As String = txtDescription.Text
+
+            If String.IsNullOrWhiteSpace(assetId) Then
+                assetId = "UNKNOWN"
+            End If
+
+            Dim zpl As String = "^XA" & vbCrLf &
+                                "^PW406" & vbCrLf &
+                                "^LL406" & vbCrLf &
+                                "^FO50,50^BQN,2,6^FDQA," & assetId & "^FS" & vbCrLf &
+                                "^FO50,250^A0N,20,20^FDID: " & assetId & "^FS" & vbCrLf &
+                                "^FO50,280^A0N,20,20^FD" & description & "^FS" & vbCrLf &
+                                "^XZ"
+
+            Dim bSuccess As Boolean = RawPrinterHelper.SendStringToPrinter("ZDesigner GK888t", zpl)
+            If bSuccess Then
+                ClientScript.RegisterStartupScript(Me.GetType(), "PrintAlert", "alert('Sent to printer.');", True)
+            Else
+                ClientScript.RegisterStartupScript(Me.GetType(), "PrintAlert", "alert('Unable to reach the Zebra printer - please confirm it is connected and powered on.');", True)
+            End If
+        Catch ex As Exception
+            ClientScript.RegisterStartupScript(Me.GetType(), "PrintAlert", "alert('Unable to reach the Zebra printer - please confirm it is connected and powered on.');", True)
+        End Try
     End Sub
 End Class

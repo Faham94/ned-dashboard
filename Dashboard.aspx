@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>Asset Information Form</title>
+    <meta charset="utf-8" />
+    <title>Asset Management System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -77,7 +78,7 @@
         .top-header {
             background-color: var(--header-bg);
             border-bottom: 2px solid var(--maroon);
-            padding: 6px 20px;
+            padding: 4px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -97,21 +98,21 @@
         }
 
         .main-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: var(--maroon);
             line-height: 1.15;
         }
 
         .sub-title {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: var(--green);
             margin-top: 1px;
         }
 
         .role-line {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 500;
             color: var(--navy);
             margin-top: 1px;
@@ -123,7 +124,7 @@
         }
 
         .system-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--navy);
             letter-spacing: -0.5px;
@@ -132,7 +133,7 @@
         /* 2. Sub-Header Info Bar */
         .info-bar {
             background-color: var(--info-bar-bg);
-            padding: 4px 20px;
+            padding: 3px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -201,7 +202,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 14px;
+            padding: 4px 14px;
             color: white;
             text-decoration: none;
             font-weight: 600;
@@ -254,14 +255,14 @@
         /* 4. Page Title Bar */
         .page-title-bar {
             background-color: var(--title-bar-bg);
-            padding: 4px;
+            padding: 3px;
             text-align: center;
             border-bottom: 1px solid var(--card-border);
             flex-shrink: 0;
         }
 
         .page-title {
-            font-size: 0.92rem;
+            font-size: 0.88rem;
             font-weight: 700;
             color: var(--navy);
             text-transform: uppercase;
@@ -272,12 +273,12 @@
         .main-container {
             flex: 1;
             min-height: 0;
-            padding: 8px 12px;
+            padding: 6px 10px;
             width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             overflow: hidden;
         }
 
@@ -287,7 +288,7 @@
             min-height: 0;
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 8px;
+            gap: 6px;
             overflow: hidden;
         }
 
@@ -304,7 +305,7 @@
         }
 
         .card-header {
-            padding: 6px 12px;
+            padding: 4px 10px;
             color: white;
             font-weight: 700;
             font-size: 0.85rem;
@@ -325,10 +326,10 @@
         }
 
         .card-body {
-            padding: 8px 12px;
+            padding: 6px 10px;
             flex: 1;
             min-height: 0;
-            overflow-y: auto;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -337,7 +338,10 @@
         .form-columns {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
         }
 
         @media (max-width: 768px) {
@@ -349,28 +353,28 @@
         .form-column {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 130px 1fr;
-            gap: 4px;
+            gap: 2px;
             align-items: center;
         }
 
         .form-label {
             font-weight: 600;
-            font-size: 0.79rem;
+            font-size: 0.75rem;
             color: var(--text-primary);
             text-align: right;
         }
 
         .form-input-entry {
             width: 100%;
-            height: 29px;
-            padding: 4px 8px;
-            font-size: 0.79rem;
+            height: 24px;
+            padding: 2px 6px;
+            font-size: 0.76rem;
             color: #1e293b;
             background-color: #ffffff;
             border: 1px solid #fca5a5; /* Light Red Border */
@@ -396,7 +400,7 @@
         .input-with-icon .form-input-entry {
             background-color: #eef2f7; /* Subtle darker shade than normal pure white textboxes */
             border: 1px solid #f87171; /* Light Red Border */
-            padding-right: 32px; /* room for small blue square search icon */
+            padding-right: 26px; /* room for small blue square search icon */
         }
 
         .input-with-icon .form-input-entry:focus {
@@ -416,11 +420,11 @@
             background-color: #f8fafc;
             border: 1px solid var(--card-border);
             border-radius: 6px;
-            padding: 4px 10px;
+            padding: 3px 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             flex-shrink: 0;
         }
 
@@ -459,8 +463,8 @@
         }
 
         .qr-placeholder {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
             background-color: white;
@@ -470,8 +474,8 @@
         }
 
         .qr-image {
-            width: 42px;
-            height: 42px;
+            width: 36px;
+            height: 36px;
         }
 
         .btn-print-qr {
@@ -541,7 +545,6 @@
             flex: 1;
             min-height: 0;
             overflow-y: auto;
-            max-height: none;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
         }
@@ -617,10 +620,10 @@
         /* Error / Notification Message Styling */
         .msg-label {
             display: block;
-            font-size: 0.78rem;
-            padding: 6px 12px;
+            font-size: 0.75rem;
+            padding: 4px 8px;
             border-radius: 4px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: center;
             font-weight: 600;
             flex-shrink: 0;
@@ -632,11 +635,17 @@
             border: 1px solid #fca5a5;
         }
 
+        .success-msg {
+            color: #14532d;
+            background-color: #f0fdf4;
+            border: 1px solid #86efac;
+        }
+
         /* 6. Bottom Action Bar (Toolbar) */
         .action-toolbar {
             background-color: #0f172a;
             border-top: 1px solid #1e3a8a; /* Thin lighter-blue top border */
-            padding: 6px 16px;
+            padding: 4px 12px;
             display: flex;
             justify-content: center; /* Horizontally centered tight group */
             align-items: center;
@@ -651,9 +660,9 @@
             color: #1e293b;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
-            height: 29px;
-            padding: 0 12px;
-            font-size: 0.79rem;
+            height: 25px;
+            padding: 0 10px;
+            font-size: 0.76rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
@@ -666,7 +675,7 @@
         .footer {
             background-color: #0f172a;
             color: #94a3b8;
-            padding: 4px 16px;
+            padding: 2px 12px;
             text-align: center;
             font-size: 0.72rem;
             border-top: 1px solid #1e293b;
@@ -746,6 +755,11 @@
             z-index: 1000000;
             animation: modalFadeIn 0.2s ease-out;
             pointer-events: auto !important;
+        }
+
+        #sectionLookupModalBox {
+            width: 650px;
+            max-width: 95vw;
         }
 
         @keyframes modalFadeIn {
@@ -958,9 +972,9 @@
 
         .lookup-icon {
             position: absolute;
-            right: 4px;
-            width: 22px;
-            height: 22px;
+            right: 2px;
+            width: 20px;
+            height: 20px;
             background-color: #2563eb; /* Small blue square search icon */
             color: #ffffff;
             border: none;
@@ -968,7 +982,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             cursor: pointer;
             text-decoration: none;
             line-height: 1;
@@ -1131,11 +1145,6 @@
                     </span>
                 </div>
             </div>
-            <div class="header-right">
-                <span class="system-title">
-                    <asp:Label ID="lblSystemTitle" runat="server">Asset Management System</asp:Label>
-                </span>
-            </div>
         </header>
 
         <!-- 2. Sub-Header Info Bar -->
@@ -1156,7 +1165,7 @@
             <ul class="menu-list">
                 <li class="menu-item">
                     <a href="#" class="menu-link" onclick="return false;">
-                        Master Information <span class="arrow-down">▼</span>
+                        Master Information <span class="arrow-down">&#9662;</span>
                     </a>
                     <!-- TODO: Submenu actions placeholder -->
                     <ul class="dropdown-menu">
@@ -1167,7 +1176,7 @@
                 </li>
                 <li class="menu-item">
                     <a href="#" class="menu-link" onclick="return false;">
-                        Transactions <span class="arrow-down">▼</span>
+                        Transactions <span class="arrow-down">&#9662;</span>
                     </a>
                     <!-- TODO: Submenu actions placeholder -->
                     <ul class="dropdown-menu">
@@ -1178,7 +1187,7 @@
                 </li>
                 <li class="menu-item">
                     <a href="#" class="menu-link" onclick="return false;">
-                        Reports <span class="arrow-down">▼</span>
+                        Reports <span class="arrow-down">&#9662;</span>
                     </a>
                     <!-- TODO: Submenu actions placeholder -->
                     <ul class="dropdown-menu">
@@ -1207,7 +1216,7 @@
                     <div class="card-body">
                         <asp:Label ID="lblFormMessage" runat="server" CssClass="msg-label error-msg" style="display:none;"></asp:Label>
                         <!-- 3. Asset Tag box -->
-                        <div class="asset-tag-box">
+                        <div id="divAssetTagBox" runat="server" class="asset-tag-box">
                             <div class="tag-left">
                                 <span class="form-label" style="text-align: left;">Asset Status:</span>
                                 <asp:Label ID="lblStatusText" runat="server" CssClass="status-badge-large status-active">Active</asp:Label>
@@ -1216,7 +1225,7 @@
                                 <div class="qr-placeholder">
                                     <asp:Image ID="imgQRCode" runat="server" CssClass="qr-image" ImageUrl="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=Placeholder" AlternateText="QR Code" />
                                 </div>
-                                <button type="button" class="btn-print-qr" onclick="window.print();">Print Tag</button>
+                                <asp:Button ID="btnPrintTag" runat="server" CssClass="btn-print-qr" Text="Print Tag" OnClick="btnPrintTag_Click" UseSubmitBehavior="false" />
                             </div>
                         </div>
 
@@ -1308,19 +1317,19 @@
                                 </div>
                                 <div class="form-row">
                                     <label class="form-label">Current Value:</label>
-                                    <asp:TextBox ID="txtCurrentValue" runat="server" CssClass="form-input-entry"></asp:TextBox>
+                                    <asp:TextBox ID="txtCurrentValue" runat="server" CssClass="form-input-entry" ReadOnly="true"></asp:TextBox>
                                 </div>
                                 <div class="form-row">
                                     <label class="form-label">Acc. Deprec.:</label>
-                                    <asp:TextBox ID="txtAccDeprec" runat="server" CssClass="form-input-entry"></asp:TextBox>
+                                    <asp:TextBox ID="txtAccDeprec" runat="server" CssClass="form-input-entry" ReadOnly="true"></asp:TextBox>
                                 </div>
                                 <div class="form-row">
                                     <label class="form-label">FY Opening Bal.:</label>
-                                    <asp:TextBox ID="txtFYOpeningBal" runat="server" CssClass="form-input-entry"></asp:TextBox>
+                                    <asp:TextBox ID="txtFYOpeningBal" runat="server" CssClass="form-input-entry" ReadOnly="true"></asp:TextBox>
                                 </div>
                                 <div class="form-row">
                                     <label class="form-label">FY Closing Bal.:</label>
-                                    <asp:TextBox ID="txtFYClosingBal" runat="server" CssClass="form-input-entry"></asp:TextBox>
+                                    <asp:TextBox ID="txtFYClosingBal" runat="server" CssClass="form-input-entry" ReadOnly="true"></asp:TextBox>
                                 </div>
                                 <div class="form-row">
                                     <label class="form-label">Dep. Start Date:</label>
@@ -1328,21 +1337,15 @@
                                 </div>
                                  <div class="form-row">
                                      <label class="form-label">First Depr. FY:</label>
-                                     <div class="input-with-icon">
-                                         <asp:TextBox ID="txtFirstDeprFY" runat="server" CssClass="form-input-entry"></asp:TextBox>
-                                         <asp:LinkButton ID="btnOpenFirstDeprFYLookup" runat="server" CssClass="lookup-icon" OnClick="btnOpenFirstDeprFYLookup_Click" UseSubmitBehavior="false" Title="Browse financial years">&#128269;</asp:LinkButton>
-                                     </div>
+                                     <asp:TextBox ID="txtFirstDeprFY" runat="server" CssClass="form-input-entry" ReadOnly="true"></asp:TextBox>
                                  </div>
                                  <div class="form-row">
                                      <label class="form-label">Last Depr. FY:</label>
-                                     <div class="input-with-icon">
-                                         <asp:TextBox ID="txtLastDeprFY" runat="server" CssClass="form-input-entry"></asp:TextBox>
-                                         <asp:LinkButton ID="btnOpenLastDeprFYLookup" runat="server" CssClass="lookup-icon" OnClick="btnOpenLastDeprFYLookup_Click" UseSubmitBehavior="false" Title="Browse financial years">&#128269;</asp:LinkButton>
-                                     </div>
+                                     <asp:TextBox ID="txtLastDeprFY" runat="server" CssClass="form-input-entry" ReadOnly="true"></asp:TextBox>
                                  </div>
                                  <div class="form-row">
                                      <label class="form-label">Purchase Date:</label>
-                                     <asp:TextBox ID="txtPurchaseDate" runat="server" CssClass="form-input-entry"></asp:TextBox>
+                                     <asp:TextBox ID="txtPurchaseDate" runat="server" CssClass="form-input-entry" placeholder="dd/MM/yyyy"></asp:TextBox>
                                  </div>
                                  <div class="form-row">
                                      <label class="form-label">Purchase FY:</label>
@@ -1353,7 +1356,7 @@
                                  </div>
                                 <div class="form-row">
                                     <label class="form-label">Warranty Exp.:</label>
-                                    <asp:TextBox ID="txtWarrantyExp" runat="server" CssClass="form-input-entry"></asp:TextBox>
+                                    <asp:TextBox ID="txtWarrantyExp" runat="server" CssClass="form-input-entry" placeholder="dd/MM/yyyy"></asp:TextBox>
                                 </div>
                                 <div class="form-row">
                                     <label class="form-label">Disposal Date:</label>
@@ -1546,7 +1549,7 @@
                 <div class="modal-body">
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                         <asp:TextBox ID="txtCategorySearch" runat="server" CssClass="modal-search-input"></asp:TextBox>
-                        <asp:Button ID="btnCategorySearch" runat="server" Text="Search" OnClick="btnCategorySearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
+                        <asp:Button ID="btnCategorySearch" runat="server" Text="Search" OnClick="btnCategorySearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="false" />
                     </div>
                     <div class="modal-results-container">
                         <asp:Label ID="lblCategoryError" runat="server" CssClass="modal-no-results" Visible="false">Unable to load categories</asp:Label>
@@ -1591,7 +1594,7 @@
                 <div class="modal-body">
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                         <asp:TextBox ID="txtBrandSearch" runat="server" CssClass="modal-search-input"></asp:TextBox>
-                        <asp:Button ID="btnBrandSearch" runat="server" Text="Search" OnClick="btnBrandSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
+                        <asp:Button ID="btnBrandSearch" runat="server" Text="Search" OnClick="btnBrandSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="false" />
                     </div>
                     <div class="modal-results-container">
                         <asp:Label ID="lblBrandError" runat="server" CssClass="modal-no-results" Visible="false">Unable to load brands</asp:Label>
@@ -1636,7 +1639,7 @@
                 <div class="modal-body">
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                         <asp:TextBox ID="txtSectionSearch" runat="server" CssClass="modal-search-input"></asp:TextBox>
-                        <asp:Button ID="btnSectionSearch" runat="server" Text="Search" OnClick="btnSectionSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
+                        <asp:Button ID="btnSectionSearch" runat="server" Text="Search" OnClick="btnSectionSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="false" />
                     </div>
                     <div class="modal-results-container">
                         <asp:Label ID="lblSectionError" runat="server" CssClass="modal-no-results" Visible="false">Unable to load sections</asp:Label>
@@ -1644,7 +1647,8 @@
                             <thead>
                                 <tr>
                                     <th>Section ID</th>
-                                    <th>Section Name</th>
+                                    <th>Department</th>
+                                    <th>Section</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1652,6 +1656,7 @@
                                     <ItemTemplate>
                                         <tr class="modal-row" ondblclick="selectSectionValue('<%# HttpUtility.JavaScriptStringEncode(Eval("SectionName").ToString()) %>');">
                                             <td class="modal-row-id"><%# Eval("SectionId") %></td>
+                                            <td><%# HttpUtility.HtmlEncode(Eval("Department")) %></td>
                                             <td>
                                                 <span class="select-link"><%# HttpUtility.HtmlEncode(Eval("SectionName")) %></span>
                                             </td>
@@ -1681,7 +1686,7 @@
                 <div class="modal-body">
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                         <asp:TextBox ID="txtBudgetSearch" runat="server" CssClass="modal-search-input"></asp:TextBox>
-                        <asp:Button ID="btnBudgetSearch" runat="server" Text="Search" OnClick="btnBudgetSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
+                        <asp:Button ID="btnBudgetSearch" runat="server" Text="Search" OnClick="btnBudgetSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="false" />
                     </div>
                     <div class="modal-results-container">
                         <asp:Label ID="lblBudgetError" runat="server" CssClass="modal-no-results" Visible="false">Unable to load budget accounts</asp:Label>
@@ -1726,7 +1731,7 @@
                 <div class="modal-body">
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                         <asp:TextBox ID="txtSupplierSearch" runat="server" CssClass="modal-search-input"></asp:TextBox>
-                        <asp:Button ID="btnSupplierSearch" runat="server" Text="Search" OnClick="btnSupplierSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
+                        <asp:Button ID="btnSupplierSearch" runat="server" Text="Search" OnClick="btnSupplierSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="false" />
                     </div>
                     <div class="modal-results-container">
                         <asp:Label ID="lblSupplierError" runat="server" CssClass="modal-no-results" Visible="false">Unable to load suppliers</asp:Label>
@@ -1771,7 +1776,7 @@
                 <div class="modal-body">
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                         <asp:TextBox ID="txtPurchaseFYSearch" runat="server" CssClass="modal-search-input"></asp:TextBox>
-                        <asp:Button ID="btnPurchaseFYSearch" runat="server" Text="Search" OnClick="btnPurchaseFYSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
+                        <asp:Button ID="btnPurchaseFYSearch" runat="server" Text="Search" OnClick="btnPurchaseFYSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="false" />
                     </div>
                     <div class="modal-results-container">
                         <asp:Label ID="lblPurchaseFYError" runat="server" CssClass="modal-no-results" Visible="false">Unable to load financial years</asp:Label>
@@ -1816,7 +1821,7 @@
                 <div class="modal-body">
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                         <asp:TextBox ID="txtFirstDeprFYSearch" runat="server" CssClass="modal-search-input"></asp:TextBox>
-                        <asp:Button ID="btnFirstDeprFYSearch" runat="server" Text="Search" OnClick="btnFirstDeprFYSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
+                        <asp:Button ID="btnFirstDeprFYSearch" runat="server" Text="Search" OnClick="btnFirstDeprFYSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="false" />
                     </div>
                     <div class="modal-results-container">
                         <asp:Label ID="lblFirstDeprFYError" runat="server" CssClass="modal-no-results" Visible="false">Unable to load financial years</asp:Label>
@@ -1861,7 +1866,7 @@
                 <div class="modal-body">
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                         <asp:TextBox ID="txtLastDeprFYSearch" runat="server" CssClass="modal-search-input"></asp:TextBox>
-                        <asp:Button ID="btnLastDeprFYSearch" runat="server" Text="Search" OnClick="btnLastDeprFYSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
+                        <asp:Button ID="btnLastDeprFYSearch" runat="server" Text="Search" OnClick="btnLastDeprFYSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="false" />
                     </div>
                     <div class="modal-results-container">
                         <asp:Label ID="lblLastDeprFYError" runat="server" CssClass="modal-no-results" Visible="false">Unable to load financial years</asp:Label>
@@ -1906,7 +1911,7 @@
                 <div class="modal-body">
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                         <asp:TextBox ID="txtDisposalReasonSearch" runat="server" CssClass="modal-search-input"></asp:TextBox>
-                        <asp:Button ID="btnDisposalReasonSearch" runat="server" Text="Search" OnClick="btnDisposalReasonSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="true" />
+                        <asp:Button ID="btnDisposalReasonSearch" runat="server" Text="Search" OnClick="btnDisposalReasonSearch_Click" CssClass="modal-search-btn" UseSubmitBehavior="false" />
                     </div>
                     <div class="modal-results-container">
                         <asp:Label ID="lblDisposalReasonError" runat="server" CssClass="modal-no-results" Visible="false">Unable to load disposal reasons</asp:Label>
@@ -2117,6 +2122,158 @@
                 }
             }
 
+            function isValidDate(dateStr) {
+                var parts = dateStr.split('/');
+                if (parts.length !== 3) return false;
+                var day = parseInt(parts[0], 10);
+                var month = parseInt(parts[1], 10) - 1;
+                var year = parseInt(parts[2], 10);
+                
+                if (isNaN(day) || isNaN(month) || isNaN(year)) return false;
+                if (year < 1900 || year > 2100) return false;
+                
+                var d = new Date(year, month, day);
+                return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+            }
+
+            function initDateMask(elementId) {
+                var el = document.getElementById(elementId);
+                if (!el) return;
+                
+                el.setAttribute("placeholder", "dd/MM/yyyy");
+                
+                el.addEventListener('keypress', function (e) {
+                    if (e.key === '/') {
+                        var val = e.target.value;
+                        var cursor = e.target.selectionStart;
+                        if (cursor !== val.length) return;
+                        
+                        var parts = val.split('/');
+                        var currentPart = parts[parts.length - 1];
+                        if (currentPart.length === 1 && currentPart !== '0') {
+                            e.preventDefault();
+                            parts[parts.length - 1] = '0' + currentPart;
+                            e.target.value = parts.join('/') + '/';
+                            var event = new Event('input', { bubbles: true });
+                            e.target.dispatchEvent(event);
+                        }
+                    }
+                });
+
+                el.addEventListener('input', function (e) {
+                    var val = e.target.value;
+                    if (e.inputType === 'deleteContentBackward') return;
+                    
+                    var digits = val.replace(/\D/g, '');
+                    var cleanDigits = "";
+                    
+                    // Day
+                    if (digits.length >= 1) {
+                        var d1 = digits[0];
+                        if (d1 !== '0' && d1 !== '1' && d1 !== '2' && d1 !== '3') {
+                            cleanDigits += '0' + d1;
+                        } else {
+                            cleanDigits += d1;
+                            if (digits.length >= 2) {
+                                var d2 = digits[1];
+                                if (d1 === '3') {
+                                    if (d2 !== '0' && d2 !== '1') {
+                                        cleanDigits += '1'; // Clamp to 31
+                                    } else {
+                                        cleanDigits += d2;
+                                    }
+                                } else {
+                                    cleanDigits += d2;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Month
+                    var startIdx = 2;
+                    if (digits.length >= 1 && (digits[0] !== '0' && digits[0] !== '1' && digits[0] !== '2' && digits[0] !== '3')) {
+                        startIdx = 1;
+                    }
+                    
+                    var remaining = digits.substring(startIdx);
+                    if (remaining.length >= 1) {
+                        var m1 = remaining[0];
+                        if (m1 !== '0' && m1 !== '1') {
+                            cleanDigits += '0' + m1;
+                        } else {
+                            cleanDigits += m1;
+                            if (remaining.length >= 2) {
+                                var m2 = remaining[1];
+                                if (m1 === '1') {
+                                    if (m2 !== '0' && m2 !== '1' && m2 !== '2') {
+                                        cleanDigits += '2'; // Clamp to 12
+                                    } else {
+                                        cleanDigits += m2;
+                                    }
+                                } else {
+                                    cleanDigits += m2;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Year
+                    var startYearIdx = 4;
+                    if (digits.length >= 1 && (digits[0] !== '0' && digits[0] !== '1' && digits[0] !== '2' && digits[0] !== '3')) {
+                        startYearIdx--;
+                    }
+                    if (remaining.length >= 1 && (remaining[0] !== '0' && remaining[0] !== '1')) {
+                        startYearIdx--;
+                    }
+                    
+                    var yearPart = digits.substring(startYearIdx).substring(0, 4);
+                    cleanDigits += yearPart;
+                    
+                    var formatted = "";
+                    if (cleanDigits.length > 0) {
+                        formatted += cleanDigits.substring(0, 2);
+                        if (cleanDigits.length > 2) {
+                            formatted += '/' + cleanDigits.substring(2, 4);
+                            if (cleanDigits.length > 4) {
+                                formatted += '/' + cleanDigits.substring(4, 8);
+                            }
+                        }
+                    }
+                    
+                    e.target.value = formatted;
+                });
+
+                el.addEventListener('blur', function (e) {
+                    var val = e.target.value.trim();
+                    if (val === "") return;
+                    
+                    var msgLabel = document.getElementById('<%= lblFormMessage.ClientID %>');
+                    if (!isValidDate(val)) {
+                        if (msgLabel) {
+                            msgLabel.innerText = "Please enter a valid date (DD/MM/YYYY)";
+                            msgLabel.style.display = "block";
+                        }
+                    } else {
+                        if (msgLabel && msgLabel.innerText === "Please enter a valid date (DD/MM/YYYY)") {
+                            msgLabel.innerText = "";
+                            msgLabel.style.display = "none";
+                        }
+                    }
+                });
+            }
+
+            function initAllDateMasks() {
+                initDateMask('<%= txtPurchaseDate.ClientID %>');
+                initDateMask('<%= txtWarrantyExp.ClientID %>');
+            }
+
+            initAllDateMasks();
+            document.addEventListener("DOMContentLoaded", initAllDateMasks);
+            window.addEventListener("load", initAllDateMasks);
+            if (typeof Sys !== "undefined" && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+                Sys.WebForms.PageRequestManager.getInstance().add_endRequest(initAllDateMasks);
+            }
+
             function validateDataEntryForm() {
                 var categoryEl = document.getElementById('<%= txtCategory.ClientID %>');
                 var brandEl = document.getElementById('<%= txtBrand.ClientID %>');
@@ -2146,6 +2303,32 @@
                         msgLabel.style.display = "block";
                     }
                     return false;
+                }
+
+                // Purchase Date Validation
+                var purchaseDateEl = document.getElementById('<%= txtPurchaseDate.ClientID %>');
+                var purchaseDate = purchaseDateEl ? purchaseDateEl.value.trim() : '';
+                if (purchaseDate) {
+                    if (!isValidDate(purchaseDate)) {
+                        if (msgLabel) {
+                            msgLabel.innerText = "Please enter a valid date (DD/MM/YYYY)";
+                            msgLabel.style.display = "block";
+                        }
+                        return false;
+                    }
+                }
+
+                // Warranty Exp Validation
+                var warrantyExpEl = document.getElementById('<%= txtWarrantyExp.ClientID %>');
+                var warrantyExp = warrantyExpEl ? warrantyExpEl.value.trim() : '';
+                if (warrantyExp) {
+                    if (!isValidDate(warrantyExp)) {
+                        if (msgLabel) {
+                            msgLabel.innerText = "Please enter a valid date (DD/MM/YYYY)";
+                            msgLabel.style.display = "block";
+                        }
+                        return false;
+                    }
                 }
 
                 if (msgLabel) {
